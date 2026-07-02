@@ -21,7 +21,6 @@
 
 ## Data Model
 - Timetable
-- Session
 - Teacher
 - Subject
 - Classroom

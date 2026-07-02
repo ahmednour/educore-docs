@@ -17,7 +17,7 @@
 
 ## Data Model
 - Exam
-- Grade
+- ExamResult
 - Subject
 - Student
 

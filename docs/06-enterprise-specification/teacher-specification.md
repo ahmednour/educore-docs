@@ -21,9 +21,8 @@
 
 ## Data Model
 - Teacher
-- Department
 - Subject
-- TimetableAssignment
+- TeacherAssignment
 
 ## API Contracts
 - GET /teachers

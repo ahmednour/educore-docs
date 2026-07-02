@@ -21,11 +21,13 @@
 - تسجيل جميع العمليات الحساسة في Audit Log.
 
 ## Data Model
+- Fee
 - Invoice
 - Payment
 - Discount
-- Refund
-- StudentAccount
+
+> Refund لا يُنفَّذ كجدول منفصل، بل عبر عمود payments.reversed طبقاً لـ BR-1505 (إلغاء بدل حذف).
+> StudentAccount ليس جدولاً فعلياً بل View محسوب من Fee وInvoice وPayment لعرض كشف الحساب.
 
 ## API Contracts
 - GET /finance/invoices

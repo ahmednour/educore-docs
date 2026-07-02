@@ -1,0 +1,154 @@
+diff --git a/docs/02-database/schema.md b/docs/02-database/schema.md
+index 894e79e..fd9fe07 100644
+--- a/docs/02-database/schema.md
++++ b/docs/02-database/schema.md
+@@ -37,6 +37,26 @@ branch_id.
+ 
+ ---
+ 
++## users
++جدول أساسي مستقل عن الفروع
++(لا يحتوي branch_id مباشرة، لأن المستخدم قد يصل لأكثر من فرع عبر user_roles).
++
++| العمود | النوع | ملاحظات |
++|---|---|---|
++| id | UUID | PRIMARY KEY |
++| username | VARCHAR(100) | UNIQUE NOT NULL |
++| email | VARCHAR(150) | UNIQUE NULLABLE |
++| phone | VARCHAR(20) | UNIQUE NULLABLE |
++| password_hash | TEXT | NOT NULL |
++| status | VARCHAR(20) | Active / Suspended / Locked |
++| last_login_at | TIMESTAMPTZ | NULLABLE |
++| mfa_enabled | BOOLEAN | DEFAULT false — طبقاً لـ ADR-001 |
++| created_at | TIMESTAMPTZ | NOT NULL DEFAULT now() |
++| updated_at | TIMESTAMPTZ | NOT NULL DEFAULT now() |
++
++> هذا الجدول هو المرجع الفعلي لكل الإشارات إلى users.id المذكورة في باقي الجداول
++(created_by، updated_by، teachers.user_id، parents.user_id، audit_logs.user_id).
++
+ ## branches
+ | العمود | النوع | ملاحظات |
+ |---|---|---|
+@@ -138,7 +158,7 @@ branch_id.
+ |---|---|---|
+ | student_id | UUID | FK → students.id |
+ | parent_id | UUID | FK → parents.id |
+-| relationship | VARCHAR(30) | Father / Mother / Guardian-of-record |
++| relationship | VARCHAR(30) | Father / Mother / LegalGuardian |
+ | is_primary | BOOLEAN | DEFAULT false |
+ 
+ **Index:** UNIQUE (student_id, parent_id)
+@@ -219,6 +239,22 @@ branch_id.
+ | paid_at | TIMESTAMPTZ | NOT NULL |
+ | reversed | BOOLEAN | DEFAULT false — يُستخدم بدل الحذف طبقاً لـ BR-1505 |
+ 
++## discounts
++يمثل الإعفاء أو المنحة المذكورة في
++01-business/fees-and-payments.md
++
++ولم تكن موثقة سابقاً كجدول فعلي.
++
++| العمود | النوع | ملاحظات |
++|---|---|---|
++| student_id | UUID | FK → students.id |
++| academic_year_id | UUID | FK → academic_years.id |
++| type | VARCHAR(30) | Discount / Scholarship |
++| value_type | VARCHAR(10) | Percentage / Fixed |
++| value | NUMERIC(12,2) | NOT NULL |
++| reason | VARCHAR(200) | |
++| approved_by | UUID | FK → users.id |
++
+ ## roles / permissions / role_permissions / user_roles
+ تصميم RBAC قياسي:
+ - roles (id, name, branch_scoped BOOLEAN)
+diff --git a/docs/06-enterprise-specification/attendance-specification.md b/docs/06-enterprise-specification/attendance-specification.md
+index c36d571..ab77f5f 100644
+--- a/docs/06-enterprise-specification/attendance-specification.md
++++ b/docs/06-enterprise-specification/attendance-specification.md
+@@ -22,9 +22,9 @@
+ 
+ ## Data Model
+ - Attendance
+-- Student
+-- Class
+-- Session
++- Enrollment
++- Classroom
++- Timetable
+ - AttendanceStatus
+ 
+ ## API Contracts
+diff --git a/docs/06-enterprise-specification/enrollment-specification.md b/docs/06-enterprise-specification/enrollment-specification.md
+index d91d57b..ed809b5 100644
+--- a/docs/06-enterprise-specification/enrollment-specification.md
++++ b/docs/06-enterprise-specification/enrollment-specification.md
+@@ -24,8 +24,7 @@
+ - Enrollment
+ - Student
+ - AcademicYear
+-- Class
+-- Section
++- Classroom
+ 
+ ## API Contracts
+ - GET /enrollments
+diff --git a/docs/06-enterprise-specification/exam-specification.md b/docs/06-enterprise-specification/exam-specification.md
+index 07d053e..e5f7a09 100644
+--- a/docs/06-enterprise-specification/exam-specification.md
++++ b/docs/06-enterprise-specification/exam-specification.md
+@@ -17,7 +17,7 @@
+ 
+ ## Data Model
+ - Exam
+-- Grade
++- ExamResult
+ - Subject
+ - Student
+ 
+diff --git a/docs/06-enterprise-specification/finance-specification.md b/docs/06-enterprise-specification/finance-specification.md
+index 3fb7597..1b00c73 100644
+--- a/docs/06-enterprise-specification/finance-specification.md
++++ b/docs/06-enterprise-specification/finance-specification.md
+@@ -21,11 +21,13 @@
+ - تسجيل جميع العمليات الحساسة في Audit Log.
+ 
+ ## Data Model
++- Fee
+ - Invoice
+ - Payment
+ - Discount
+-- Refund
+-- StudentAccount
++
++> Refund لا يُنفَّذ كجدول منفصل، بل عبر عمود payments.reversed طبقاً لـ BR-1505 (إلغاء بدل حذف).
++> StudentAccount ليس جدولاً فعلياً بل View محسوب من Fee وInvoice وPayment لعرض كشف الحساب.
+ 
+ ## API Contracts
+ - GET /finance/invoices
+diff --git a/docs/06-enterprise-specification/teacher-specification.md b/docs/06-enterprise-specification/teacher-specification.md
+index d50df53..e48524d 100644
+--- a/docs/06-enterprise-specification/teacher-specification.md
++++ b/docs/06-enterprise-specification/teacher-specification.md
+@@ -21,9 +21,8 @@
+ 
+ ## Data Model
+ - Teacher
+-- Department
+ - Subject
+-- TimetableAssignment
++- TeacherAssignment
+ 
+ ## API Contracts
+ - GET /teachers
+diff --git a/docs/06-enterprise-specification/timetable-specification.md b/docs/06-enterprise-specification/timetable-specification.md
+index e0a1dac..c093f1d 100644
+--- a/docs/06-enterprise-specification/timetable-specification.md
++++ b/docs/06-enterprise-specification/timetable-specification.md
+@@ -21,7 +21,6 @@
+ 
+ ## Data Model
+ - Timetable
+-- Session
+ - Teacher
+ - Subject
+ - Classroom

@@ -37,6 +37,26 @@ branch_id.
 
 ---
 
+## users
+جدول أساسي مستقل عن الفروع
+(لا يحتوي branch_id مباشرة، لأن المستخدم قد يصل لأكثر من فرع عبر user_roles).
+
+| العمود | النوع | ملاحظات |
+|---|---|---|
+| id | UUID | PRIMARY KEY |
+| username | VARCHAR(100) | UNIQUE NOT NULL |
+| email | VARCHAR(150) | UNIQUE NULLABLE |
+| phone | VARCHAR(20) | UNIQUE NULLABLE |
+| password_hash | TEXT | NOT NULL |
+| status | VARCHAR(20) | Active / Suspended / Locked |
+| last_login_at | TIMESTAMPTZ | NULLABLE |
+| mfa_enabled | BOOLEAN | DEFAULT false — طبقاً لـ ADR-001 |
+| created_at | TIMESTAMPTZ | NOT NULL DEFAULT now() |
+| updated_at | TIMESTAMPTZ | NOT NULL DEFAULT now() |
+
+> هذا الجدول هو المرجع الفعلي لكل الإشارات إلى users.id المذكورة في باقي الجداول
+(created_by، updated_by، teachers.user_id، parents.user_id، audit_logs.user_id).
+
 ## branches
 | العمود | النوع | ملاحظات |
 |---|---|---|
@@ -138,7 +158,7 @@ branch_id.
 |---|---|---|
 | student_id | UUID | FK → students.id |
 | parent_id | UUID | FK → parents.id |
-| relationship | VARCHAR(30) | Father / Mother / Guardian-of-record |
+| relationship | VARCHAR(30) | Father / Mother / LegalGuardian |
 | is_primary | BOOLEAN | DEFAULT false |
 
 **Index:** UNIQUE (student_id, parent_id)
@@ -218,6 +238,22 @@ branch_id.
 | method | VARCHAR(30) | Cash / Card / BankTransfer |
 | paid_at | TIMESTAMPTZ | NOT NULL |
 | reversed | BOOLEAN | DEFAULT false — يُستخدم بدل الحذف طبقاً لـ BR-1505 |
+
+## discounts
+يمثل الإعفاء أو المنحة المذكورة في
+01-business/fees-and-payments.md
+
+ولم تكن موثقة سابقاً كجدول فعلي.
+
+| العمود | النوع | ملاحظات |
+|---|---|---|
+| student_id | UUID | FK → students.id |
+| academic_year_id | UUID | FK → academic_years.id |
+| type | VARCHAR(30) | Discount / Scholarship |
+| value_type | VARCHAR(10) | Percentage / Fixed |
+| value | NUMERIC(12,2) | NOT NULL |
+| reason | VARCHAR(200) | |
+| approved_by | UUID | FK → users.id |
 
 ## roles / permissions / role_permissions / user_roles
 تصميم RBAC قياسي:

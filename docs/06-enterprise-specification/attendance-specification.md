@@ -22,9 +22,9 @@
 
 ## Data Model
 - Attendance
-- Student
-- Class
-- Session
+- Enrollment
+- Classroom
+- Timetable
 - AttendanceStatus
 
 ## API Contracts

@@ -24,8 +24,7 @@
 - Enrollment
 - Student
 - AcademicYear
-- Class
-- Section
+- Classroom
 
 ## API Contracts
 - GET /enrollments
