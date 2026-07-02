@@ -4,6 +4,7 @@
 يوضح هذا المستند الكيانات الأساسية في EduCore والعلاقات بينها كنموذج منطقي مستقل عن نوع قاعدة البيانات.
 
 ## الكيانات الأساسية
+- User
 - Branch
 - AcademicYear
 - Stage
@@ -21,6 +22,7 @@
 - Exam
 - ExamResult
 - Fee
+- Discount
 - Invoice
 - Payment
 - Role

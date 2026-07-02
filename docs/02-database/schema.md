@@ -262,6 +262,34 @@ branch_id.
 - role_permissions (role_id, permission_id)
 - user_roles (user_id, role_id, branch_id NULLABLE)
 
+## notifications
+يطبق قواعد العمل
+BR-1701
+
+إلى
+
+BR-1704
+
+المذكورة في
+
+01-business/notifications.md،
+
+ولم يكن موثقاً سابقاً كجدول فعلي.
+
+| العمود | النوع | ملاحظات |
+|---|---|---|
+| recipient_user_id | UUID | FK → users.id |
+| event_type | VARCHAR(50) | مثال: StudentEnrolled, AttendanceAbsence, ExamResultPublished — BR-1701 |
+| channel | VARCHAR(20) | InApp / Email / SMS / Push / WhatsApp — BR-1702 |
+| title | VARCHAR(200) | NOT NULL |
+| body | TEXT | NOT NULL |
+| status | VARCHAR(20) | Pending / Sent / Delivered / Failed — BR-1703 |
+| sent_at | TIMESTAMPTZ | NULLABLE |
+| delivered_at | TIMESTAMPTZ | NULLABLE |
+| retry_count | SMALLINT | DEFAULT 0 — لدعم إعادة المحاولة عند الفشل |
+
+**Index:** (recipient_user_id, status)
+
 ## audit_logs
 | العمود | النوع | ملاحظات |
 |---|---|---|
