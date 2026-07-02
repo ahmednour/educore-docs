@@ -1,0 +1,384 @@
+@diff --git a/docs/04-architecture/backend-architecture.md b/docs/04-architecture/backend-architecture.md
+index de3752d..e4c8706 100644
+--- a/docs/04-architecture/backend-architecture.md
++++ b/docs/04-architecture/backend-architecture.md
+@@ -4,34 +4,34 @@
+ يوثق هذا المستند البنية الخلفية (Backend) لنظام EduCore، مع تحديد المكونات، ومسؤولياتها، وآلية التواصل بينها بما يتوافق مع مبادئ Clean Architecture وDDD.
+ 
+ ## التقنيات المقترحة
+-- ASP.NET Core Web API
+-- Entity Framework Core
++- NestJS (Node.js / TypeScript)
++- Prisma ORM أو TypeORM
+ - PostgreSQL
+-- MediatR (CQRS)
+-- FluentValidation
+-- JWT Authentication
++- CQRS Module (المدمج في NestJS، بديل MediatR)
++- class-validator / Zod
++- Passport.js (JWT Strategy + OAuth 2.1)
+ 
+ ## المكونات الرئيسية
+-- API Controllers
+-- Application Services
+-- Commands & Queries
+-- Domain Models
++- Controllers (NestJS)
++- Application Services / Use Cases
++- Commands & Queries (CQRS)
++- Domain Models / Entities
+ - Repository Interfaces
+-- Infrastructure Implementations
+-- Background Workers
++- Infrastructure Implementations (Prisma/TypeORM)
++- Background Workers (BullMQ)
+ 
+ ## تدفق الطلب
+-Client → Controller → Validation → Command/Query → Domain → Repository → Database
++Client → Controller → Validation Pipe → Command/Query Handler → Domain → Repository → Database
+ 
+ ## قواعد العمل
+ - BE-0101: جميع الطلبات تمر عبر طبقة Application.
+ - BE-0102: يمنع تضمين منطق الأعمال داخل Controllers.
+-- BE-0103: يتم تنفيذ التحقق باستخدام FluentValidation.
++- BE-0103: يتم تنفيذ التحقق باستخدام class-validator أو Zod DTOs.
+ - BE-0104: تعتمد جميع عمليات الوصول للبيانات على Repository Interfaces.
+ - BE-0105: تستخدم المعاملات (Transactions) للعمليات الحرجة فقط.
+ 
+ ## اعتبارات الأداء
+-- استخدام Async/Await في جميع عمليات الإدخال والإخراج.
+-- تقليل عدد الاستعلامات باستخدام Projection.
+-- دعم Caching للبيانات المرجعية.
++- استخدام async/await في جميع عمليات الإدخال والإخراج.
++- تقليل عدد الاستعلامات باستخدام Select/Include محددة بدقة.
++- دعم Caching للبيانات المرجعية عبر Redis.
+ - مراقبة الأداء باستخدام Logging وMetrics.
+\ No newline at end of file
+diff --git a/docs/04-architecture/clean-architecture.md b/docs/04-architecture/clean-architecture.md
+index b079d45..7456328 100644
+--- a/docs/04-architecture/clean-architecture.md
++++ b/docs/04-architecture/clean-architecture.md
+@@ -32,12 +32,12 @@
+ 
+ ### 4. Infrastructure Layer
+ - PostgreSQL
+-- Entity Framework Core
++- Prisma ORM / TypeORM
+ - File Storage
+ - Email Provider
+ - SMS Provider
+ - Push Notifications
+-- Background Jobs
++- Background Jobs (BullMQ)
+ - External Integrations
+ 
+ ## قواعد الاعتماد
+diff --git a/docs/04-architecture/deployment-architecture.md b/docs/04-architecture/deployment-architecture.md
+index b738604..e158964 100644
+--- a/docs/04-architecture/deployment-architecture.md
++++ b/docs/04-architecture/deployment-architecture.md
+@@ -11,7 +11,7 @@
+ 
+ ## المكونات
+ - Reverse Proxy
+-- ASP.NET Core API
++- NestJS API
+ - Background Workers
+ - PostgreSQL
+ - Redis
+diff --git a/docs/09-architecture-decisions/ADR-010-backend-framework-nestjs.md b/docs/09-architecture-decisions/ADR-010-backend-framework-nestjs.md
+new file mode 100644
+index 0000000..f70416b
+--- /dev/null
++++ b/docs/09-architecture-decisions/ADR-010-backend-framework-nestjs.md
+@@ -0,0 +1,197 @@
++# ADR-010: Backend Framework — NestJS بدل ASP.NET Core
++
++## Status
++Accepted (يلغي الاختيار الأصلي لـ ASP.NET Core Web API المذكور سابقًا في 04-architecture/backend-architecture.md)
++
++## Context
++كان الاختيار الأولي لطبقة الـ
++Backend
++
++هو
++ASP.NET Core Web API
++
++مع
++
++Entity Framework Core،
++
++طبقاً لما كان موثق في
++
++04-architecture/backend-architecture.md.
++
++بعد مراجعة الفريق، تقرر التحول لـ
++NestJS
++
++كإطار العمل الأساسي للـ
++Backend، للحفاظ على توحيد اللغة (TypeScript) بين الـ Frontend المبني على Next.js والـ Backend، وتقليل التنقل بين لغتين مختلفتين (C# و TypeScript) داخل نفس الفريق.
++
++## Decision
++- استبدال
++ASP.NET Core Web API
++
++بـ
++
++NestJS (Node.js / TypeScript).
++
++- استبدال
++Entity Framework Core
++
++بـ
++
++Prisma ORM
++
++(أو
++
++TypeORM
++
++كبديل ثانٍ)
++
++للتعامل مع
++schema.md
++
++الموثق مسبقاً، مع بقاء
++
++PostgreSQL
++
++كما هو من غير أي تغيير.
++
++- استبدال
++MediatR
++
++بوحدة
++CQRS
++
++المدمجة داخل
++
++NestJS
++
++لتطبيق نفس نمط
++
++Commands & Queries
++
++المعتمد سابقاً.
++
++- استبدال
++FluentValidation
++
++بـ
++
++class-validator
++
++مع
++
++DTOs،
++
++أو
++
++Zod
++
++عند الحاجة لتوحيد التحقق مع الـ
++
++Frontend.
++
++- استبدال
++Background Workers
++
++المعتمدة على
++
++.NET
++
++بـ
++
++BullMQ
++
++(مبني على
++
++Redis).
++
++- مبادئ
++Clean Architecture
++
++و
++
++CQRS
++
++و
++
++Repository Pattern
++
++المعتمدة أصلاً في
++
++04-architecture/clean-architecture.md
++
++تبقى كما هي بدون تغيير، فقط الأدوات التقنية اللي بتنفذها هي اللي اتغيرت.
++
++## Alternatives Considered
++- الاستمرار بـ
++ASP.NET Core — تم الرفض بناءً على قرار الفريق بعدم العمل بـ ASP.NET.
++- Express.js
++مباشرة بدون إطار عمل منظم — تم الرفض لأن
++NestJS
++
++بيوفر هيكلية جاهزة أقرب لمبادئ
++
++Clean Architecture
++
++المعتمدة، وده بيقلل وقت إعادة بناء الهيكل من الصفر.
++
++- Python (Django/FastAPI) — تم الرفض حفاظًا على توحيد اللغة مع الـ Frontend.
++
++## Consequences
++### الإيجابيات
++- توحيد اللغة
++(TypeScript)
++
++بين الـ
++
++Frontend
++
++والـ
++
++Backend،
++
++وده بيسهّل مشاركة الـ
++
++Types
++
++والـ
++
++Validation Schemas
++
++بين الطبقتين.
++
++- منحنى تعلم أقل لو نفس المطور شغال على الفرونت والباك.
++- توفر بيئة
++Node.js
++
++الغنية بالمكتبات المفتوحة المصدر.
++
++### السلبيات
++- فقدان
++Strong Typing
++
++القوي جداً اللي بيوفره
++
++C#
++
++على مستوى الـ
++
++Compiler، رغم إن TypeScript بيقلل الفارق ده جزئيًا.
++
++- إعادة تصميم طبقة
++Infrastructure
++
++اللي كانت مبنية على افتراض
++
++Entity Framework Core
++
++تحديداً.
++
++## ملفات تم تحديثها بناءً على هذا القرار
++- 04-architecture/backend-architecture.md
++- 04-architecture/clean-architecture.md
++- 04-architecture/deployment-architecture.md
++
++## References
++- NestJS Documentation
++- Prisma Documentation
++- 09-architecture-decisions/ADR-002-database-strategy.md
+diff --git a/docs/09-architecture-decisions/README.md b/docs/09-architecture-decisions/README.md
+index f30259b..90c289c 100644
+--- a/docs/09-architecture-decisions/README.md
++++ b/docs/09-architecture-decisions/README.md
+@@ -19,5 +19,6 @@
+ 7. ADR-007 Security Model
+ 8. ADR-008 Scalability Strategy
+ 9. ADR-009 ZATCA E-Invoicing Strategy
++10. ADR-010 Backend Framework — NestJS
+ 
+ > سيتم إنشاء ملف مستقل لكل قرار معماري رئيسي.
+\ No newline at end of file
+diff --git a/docs/design-brief-for-claude-design.md b/docs/design-brief-for-claude-design.md
+new file mode 100644
+index 0000000..967dad3
+--- /dev/null
++++ b/docs/design-brief-for-claude-design.md
+@@ -0,0 +1,75 @@
++# EduCore — Design Brief for Claude Design
++
++## عن المشروع
++EduCore
++
++منصة
++ERP
++
++عربية لإدارة المراكز التعليمية
++(مدارس ومعاهد)
++
++في المملكة العربية السعودية. المستخدمون: إدارة المركز، مدرسين، موظفي استقبال ومحاسبين، وأولياء أمور. المنصة تدعم عدة فروع وعدة أعوام دراسية.
++
++## المبادئ التصميمية الحاكمة (غير قابلة للتفاوض)
++1. **العربية أولاً**
++(Arabic First) — الواجهة الافتراضية عربية، الإنجليزية لغة ثانوية.
++2. **RTL Native** — كل الشاشات مصممة أصلاً من اليمين لليسار، مش
++LTR
++
++مقلوب.
++3. **Mobile First** — طبقاً لـ
++Design System
++
++الموثق.
++4. **دعم كامل لـ WCAG 2.2 AA** — تباين ألوان مناسب، تنقل كامل بلوحة المفاتيح، توافق مع قارئات الشاشة.
++5. **الوضعين الفاتح والداكن** إلزاميين لكل مكون.
++
++## الشخصيات المستهدفة (Personas) وأولوياتهم
++- **إدارة المركز / المحاسب**: شاشات كثيفة بيانات
++(Dense Data)، جداول، فلترة، تقارير.
++- **المدرس**: شاشات سريعة الاستخدام على الموبايل
++(تسجيل حضور، رصد درجات) — أولوية لسرعة الإدخال.
++- **ولي الأمر**: شاشة متابعة بسيطة جداً
++(حالة الطالب، الرسوم المستحقة، الإشعارات) — أولوية للوضوح مش الكثافة.
++
++## الوحدات المطلوب تصميمها (بالأولوية حسب خارطة الطريق)
++1. **Identity & Administration** — تسجيل الدخول، إدارة الأدوار والصلاحيات.
++2. **Student Management** — قائمة الطلاب، صفحة تفاصيل الطالب، نموذج إنشاء/تعديل.
++3. **Academic Management** — الأعوام الدراسية، المراحل، الصفوف، الفصول.
++4. **Attendance** — تسجيل حضور سريع (واجهة موبايل للمدرس تحديداً).
++5. **Timetable** — جدول أسبوعي بصري.
++6. **Exams & Grading** — إدخال درجات، عرض نتائج.
++7. **Finance** — الفواتير، المدفوعات، كشف حساب الطالب (يشمل حالة اختيارية لعرض رمز
++QR
++
++لو الفرع مفعّل عليه
++ZATCA).
++8. **Reports & Dashboards** — لوحات معلومات مختلفة حسب الدور.
++
++## مكونات Design System الأساسية المطلوبة
++Buttons, Inputs, Cards, Tables, Dialogs, Navigation, Forms, Badges, Alerts, Toasts —
++كل واحد لازم يدعم
++RTL
++
++والوضعين الفاتح/الداكن من أول نسخة.
++
++## حالات لازم تتصمم لكل شاشة بيانات
++- Empty State (بدون بيانات، مع رسالة إيجابية وإجراء مقترح).
++- Error State (رسالة واضحة، بدون تفاصيل تقنية).
++- Loading State.
++
++## ملاحظات سياقية مهمة
++- بعض التواريخ تحتاج عرض مزدوج
++(ميلادي / هجري)
++
++حسب إعداد
++academic_years.calendar_display_mode.
++- بعض الفروع بس هيظهر عندها عناصر
++ZATCA
++
++(QR Code على الفاتورة)، والباقي فواتير عادية — التصميم لازم يستوعب الحالتين من غير ما يبان ناقص للفروع اللي مش مفعّلة.
++- لا يوجد حتى الآن نظام ألوان أو Typography نهائي معتمد — دي نقطة البداية المطلوبة من Claude Design نفسه، وليست موجودة مسبقاً.
++
++## أول طلب مقترح لـ Claude Design
++"ابدأ بتصميم نظام الألوان والـ Typography الأساسي لمنصة EduCore (عربي RTL، مركز تعليمي سعودي، وضعين فاتح وداكن)، ثم صمم شاشة تسجيل الدخول وشاشة قائمة الطلاب كنقطة انطلاق."

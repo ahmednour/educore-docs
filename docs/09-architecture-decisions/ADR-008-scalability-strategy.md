@@ -12,6 +12,7 @@ Accepted
 - دعم المعالجة غير المتزامنة (Asynchronous Processing) للمهام طويلة التنفيذ.
 - استخدام موازنة الحمل (Load Balancing) عبر نسخ التطبيق.
 - تحسين الوصول لقاعدة البيانات عبر الفهرسة وRead Replicas عند الحاجة.
+- تفعيل Connection Pooling (عبر Supavisor على Supabase، أو PgBouncer عند النقل لاستضافة أخرى) طبقاً لـ ADR-010-backend-framework-nestjs.md.
 
 ## Alternatives Considered
 - التوسع الرأسي (Vertical Scaling) فقط.

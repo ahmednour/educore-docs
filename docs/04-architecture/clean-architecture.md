@@ -32,12 +32,12 @@
 
 ### 4. Infrastructure Layer
 - PostgreSQL
-- Entity Framework Core
+- Prisma ORM / TypeORM
 - File Storage
 - Email Provider
 - SMS Provider
 - Push Notifications
-- Background Jobs
+- Background Jobs (BullMQ)
 - External Integrations
 
 ## قواعد الاعتماد

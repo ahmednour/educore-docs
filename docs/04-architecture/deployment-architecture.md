@@ -11,7 +11,7 @@
 
 ## المكونات
 - Reverse Proxy
-- ASP.NET Core API
+- NestJS API
 - Background Workers
 - PostgreSQL
 - Redis

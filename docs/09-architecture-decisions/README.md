@@ -19,5 +19,6 @@
 7. ADR-007 Security Model
 8. ADR-008 Scalability Strategy
 9. ADR-009 ZATCA E-Invoicing Strategy
+10. ADR-010 Backend Framework — NestJS
 
 > سيتم إنشاء ملف مستقل لكل قرار معماري رئيسي.
