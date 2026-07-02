@@ -1,29 +1,29 @@
 # Release Strategy
 
-## Purpose
-Define the release strategy for EduCore to ensure software is delivered in a predictable, controlled, and reliable manner.
+## الهدف
+تحديد استراتيجية الإصدار في EduCore لضمان تسليم البرمجيات بطريقة متوقعة ومنضبطة وموثوقة.
 
-## Release Types
-- Major releases
-- Minor releases
-- Patch releases
-- Emergency hotfix releases
+## أنواع الإصدارات
+- إصدارات رئيسية (Major).
+- إصدارات فرعية (Minor).
+- إصدارات تصحيحية (Patch).
+- إصدارات إصلاح عاجل (Emergency Hotfix).
 
-## Release Process
-1. Complete development.
-2. Finish verification activities.
-3. Obtain required approvals.
-4. Deploy to production.
-5. Validate release health.
-6. Monitor post-release.
+## عملية الإصدار
+1. اكتمال التطوير.
+2. اكتمال أنشطة التحقق.
+3. الحصول على الموافقات المطلوبة.
+4. النشر على بيئة الإنتاج.
+5. التحقق من صحة الإصدار.
+6. المراقبة بعد الإصدار.
 
-## Principles
-- Prefer small, incremental releases.
-- Automate deployment where possible.
-- Maintain rollback capability.
-- Communicate release plans clearly.
+## المبادئ
+- تفضيل الإصدارات الصغيرة والتدريجية.
+- أتمتة النشر قدر الإمكان.
+- الحفاظ على إمكانية التراجع (Rollback).
+- التواصل الواضح حول خطط الإصدار.
 
-## Success Criteria
-- Releases are repeatable and documented.
-- Production deployments are monitored.
-- Rollback procedures are available when required.
+## معايير النجاح
+- الإصدارات قابلة للتكرار وموثقة.
+- مراقبة عمليات النشر على الإنتاج.
+- توفر إجراءات التراجع عند الحاجة.

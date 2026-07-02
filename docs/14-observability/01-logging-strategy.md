@@ -1,33 +1,33 @@
 # Logging Strategy
 
-## Purpose
-Define the logging strategy for EduCore to ensure consistent, searchable, and actionable application and infrastructure logs.
+## الهدف
+تحديد استراتيجية التسجيل (Logging) في EduCore لضمان سجلات تطبيق وبنية تحتية متسقة وقابلة للبحث وقابلة للتنفيذ عليها.
 
-## Objectives
-- Support troubleshooting.
-- Enable security auditing.
-- Improve operational visibility.
-- Assist incident investigations.
+## الأهداف
+- دعم تحليل الأعطال (Troubleshooting).
+- تمكين التدقيق الأمني.
+- تحسين الرؤية التشغيلية.
+- المساعدة في التحقيق في الحوادث.
 
-## Log Levels
+## مستويات السجل
 - DEBUG
 - INFO
 - WARN
 - ERROR
 - FATAL
 
-## Logging Guidelines
-- Use structured logging where possible.
-- Include correlation/request IDs.
-- Avoid logging sensitive information.
-- Standardize timestamps and formats.
+## إرشادات التسجيل
+- استخدام Structured Logging قدر الإمكان.
+- تضمين معرّفات الارتباط/الطلب (Correlation / Request IDs).
+- تجنب تسجيل المعلومات الحساسة.
+- توحيد التوقيت الزمني والتنسيقات.
 
-## Retention
-- Define retention periods by log type.
-- Archive logs as required.
-- Secure access to log storage.
+## الاحتفاظ بالسجلات
+- تحديد فترات احتفاظ حسب نوع السجل.
+- أرشفة السجلات عند الحاجة.
+- تأمين الوصول إلى تخزين السجلات.
 
-## Success Criteria
-- Logs are searchable and consistent.
-- Sensitive data is protected.
-- Critical events are captured reliably.
+## معايير النجاح
+- كون السجلات قابلة للبحث ومتسقة.
+- حماية البيانات الحساسة.
+- التقاط الأحداث الحرجة بشكل موثوق.

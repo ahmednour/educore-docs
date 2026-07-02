@@ -1,27 +1,27 @@
 # Documentation Standards
 
-## Purpose
-Define documentation standards for EduCore to ensure documentation remains accurate, consistent, discoverable, and maintainable.
+## الهدف
+تحديد معايير التوثيق في EduCore لضمان بقاء الوثائق دقيقة ومتسقة وسهلة الاكتشاف والصيانة.
 
-## Principles
-- Keep documentation close to the code when appropriate.
-- Update documentation as part of every relevant change.
-- Prefer clear language and practical examples.
-- Record architectural decisions using ADRs.
+## المبادئ
+- إبقاء التوثيق قريبًا من الكود عند الملاءمة.
+- تحديث التوثيق كجزء من أي تغيير ذي صلة.
+- تفضيل اللغة الواضحة والأمثلة العملية.
+- توثيق القرارات المعمارية باستخدام ADR.
 
-## Documentation Types
-- Product documentation
-- Architecture documentation
-- API documentation
-- Developer guides
-- Operational runbooks
+## أنواع التوثيق
+- توثيق المنتج.
+- توثيق المعمارية.
+- توثيق API.
+- أدلة المطورين.
+- أدلة التشغيل (Runbooks).
 
-## Review Process
-- Documentation changes are reviewed with related code changes.
-- Broken or outdated content is corrected promptly.
-- Major documentation changes require peer review.
+## عملية المراجعة
+- مراجعة تغييرات التوثيق مع تغييرات الكود المرتبطة.
+- تصحيح المحتوى المكسور أو القديم فورًا.
+- مراجعة الأقران للتغييرات الكبيرة في التوثيق.
 
-## Success Criteria
-- Documentation reflects the current implementation.
-- New features include required documentation.
-- Documentation is easy to navigate and search.
+## معايير النجاح
+- يعكس التوثيق التنفيذ الحالي فعليًا.
+- تتضمن الميزات الجديدة التوثيق المطلوب.
+- سهولة التصفح والبحث داخل التوثيق.

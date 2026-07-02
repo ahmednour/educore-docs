@@ -1,30 +1,30 @@
 # Secure Development Lifecycle
 
-## Purpose
-Document how security-related activities are integrated throughout the EduCore software development lifecycle.
+## الهدف
+توثيق كيفية دمج الأنشطة الأمنية عبر دورة حياة تطوير برمجيات EduCore.
 
-## Objectives
-- Include verification activities in every development phase.
-- Reduce defects early.
-- Improve release readiness.
-- Support continuous improvement.
+## الأهداف
+- تضمين أنشطة التحقق في كل مرحلة تطوير.
+- تقليل العيوب مبكرًا.
+- تحسين الجاهزية للإصدار.
+- دعم التحسين المستمر.
 
-## Lifecycle Stages
-1. Requirements
-2. Design
-3. Implementation
-4. Code Review
-5. Verification
-6. Release
-7. Maintenance
+## مراحل دورة الحياة
+1. المتطلبات
+2. التصميم
+3. التنفيذ
+4. مراجعة الكود
+5. التحقق
+6. الإصدار
+7. الصيانة
 
-## Practices
-- Peer code reviews
-- Dependency updates
-- Automated quality checks
-- Release verification
+## الممارسات
+- مراجعات الكود بين الأقران.
+- تحديث التبعيات.
+- فحوصات الجودة الآلية.
+- التحقق قبل الإصدار.
 
-## Success Criteria
-- Development standards are followed.
-- Verification activities are completed before release.
-- Improvements are captured after each release.
+## معايير النجاح
+- الالتزام بمعايير التطوير.
+- إكمال أنشطة التحقق قبل الإصدار.
+- توثيق التحسينات بعد كل إصدار.

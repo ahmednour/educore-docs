@@ -32,7 +32,7 @@
 - GET /attendance/{id}
 - POST /attendance
 - PUT /attendance/{id}
-- DELETE /attendance/{id}
+- DELETE /attendance/{id} — حذف منطقي (Soft Delete) فقط، ممنوع الحذف الفعلي لسجل حضور معتمد
 
 ## UI Requirements
 - شاشة تسجيل الحضور.

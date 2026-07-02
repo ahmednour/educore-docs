@@ -1,9 +1,9 @@
 # Security & Compliance
 
-## Purpose
-This section documents the security and compliance practices for EduCore, including security architecture, data protection, risk management, compliance requirements, and secure development practices.
+## الهدف
+يوثق هذا القسم ممارسات الأمان والامتثال في EduCore، بما يشمل المعمارية الأمنية، وحماية البيانات، وإدارة المخاطر، ومتطلبات الامتثال، وممارسات التطوير الآمن.
 
-## Sections
+## الأقسام
 1. Security Architecture
 2. Compliance Requirements
 3. Data Classification
@@ -13,4 +13,4 @@ This section documents the security and compliance practices for EduCore, includ
 7. Risk Management
 8. Security Checklists
 
-> Each topic will be documented in a dedicated file.
+> سيتم توثيق كل موضوع في ملف مستقل.

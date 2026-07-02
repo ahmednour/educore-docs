@@ -1,30 +1,30 @@
 # Coding Standards
 
-## Purpose
-Define the coding standards used throughout EduCore to ensure consistency, readability, maintainability, and long-term sustainability.
+## الهدف
+تحديد معايير كتابة الكود المستخدمة في EduCore لضمان الاتساق وسهولة القراءة والصيانة والاستمرارية طويلة المدى.
 
-## General Principles
-- Write clear and self-explanatory code.
-- Prefer simplicity over unnecessary complexity.
-- Follow established project conventions.
-- Keep functions and classes focused on a single responsibility.
+## المبادئ العامة
+- كتابة كود واضح يشرح نفسه بنفسه.
+- تفضيل البساطة على التعقيد غير الضروري.
+- الالتزام بالمعايير المتفق عليها في المشروع.
+- إبقاء الدوال والفئات مركزة على مسؤولية واحدة.
 
-## Naming Conventions
-- Use meaningful names.
-- Follow language-specific naming styles.
-- Avoid abbreviations unless widely understood.
+## قواعد التسمية
+- استخدام أسماء ذات معنى واضح.
+- الالتزام بأسلوب التسمية الخاص بكل لغة برمجة.
+- تجنب الاختصارات غير المفهومة على نطاق واسع.
 
-## Code Organization
-- Group related functionality together.
-- Separate business logic from presentation.
-- Keep modules small and cohesive.
+## تنظيم الكود
+- تجميع الوظائف المترابطة معًا.
+- فصل منطق الأعمال عن طبقة العرض.
+- إبقاء الوحدات (Modules) صغيرة ومتماسكة.
 
-## Documentation
-- Document public APIs.
-- Explain non-obvious business rules.
-- Keep documentation synchronized with code.
+## التوثيق
+- توثيق واجهات API العامة.
+- شرح قواعد العمل غير الواضحة.
+- إبقاء التوثيق متزامنًا مع الكود.
 
-## Success Criteria
-- Code reviews confirm adherence to standards.
-- New code follows agreed conventions.
-- Standards evolve through team consensus.
+## معايير النجاح
+- تؤكد مراجعات الكود الالتزام بالمعايير.
+- الكود الجديد يتبع القواعد المتفق عليها.
+- تطور المعايير بتوافق الفريق.

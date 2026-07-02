@@ -31,7 +31,7 @@
 - GET /timetables/{id}
 - POST /timetables
 - PUT /timetables/{id}
-- DELETE /timetables/{id}
+- DELETE /timetables/{id} — حذف مسموح فقط قبل بدء تفعيل الجدول، وبعدها يُستخدم الأرشفة
 
 ## UI Requirements
 - عرض أسبوعي للجدول.

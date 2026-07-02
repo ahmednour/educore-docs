@@ -1,24 +1,24 @@
 # Release Notes
 
-## Purpose
-Define a standard format for documenting changes included in each EduCore release.
+## الهدف
+تحديد صيغة موحدة لتوثيق التغييرات المضمّنة في كل إصدار من EduCore.
 
-## Objectives
-- Communicate new features and fixes.
-- Highlight breaking changes.
-- Provide upgrade guidance.
-- Maintain a historical record of releases.
+## الأهداف
+- توصيل الميزات الجديدة والإصلاحات.
+- إبراز التغييرات الجذرية (Breaking Changes).
+- توفير إرشادات الترقية.
+- الحفاظ على سجل تاريخي للإصدارات.
 
-## Template
-### Version
-### Release Date
-### New Features
-### Improvements
-### Bug Fixes
-### Breaking Changes
-### Known Issues
-### Upgrade Notes
+## القالب
+### رقم الإصدار
+### تاريخ الإصدار
+### ميزات جديدة
+### تحسينات
+### إصلاحات
+### تغييرات جذرية
+### مشاكل معروفة
+### ملاحظات الترقية
 
-## Success Criteria
-- Every production release includes release notes.
-- Release notes are accurate, concise, and versioned.
+## معايير النجاح
+- تضمين كل إصدار إنتاجي لملاحظات إصدار.
+- دقة ملاحظات الإصدار واختصارها وترقيمها بشكل صحيح.

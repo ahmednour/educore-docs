@@ -30,7 +30,7 @@
 - GET /parents/{id}
 - POST /parents
 - PUT /parents/{id}
-- DELETE /parents/{id}
+- DELETE /parents/{id} — تعطيل (Deactivate) وليس حذف فعلي طالما مرتبط بطلاب (BR-0903)
 
 ## UI Requirements
 - قائمة أولياء الأمور.

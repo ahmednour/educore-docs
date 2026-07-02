@@ -1,30 +1,30 @@
 # Post-Release Validation
 
-## Purpose
-Define the validation activities performed after each EduCore production release to confirm system stability, functionality, and operational health.
+## الهدف
+تحديد أنشطة التحقق التي تُنفذ بعد كل إصدار إنتاجي لـ EduCore للتأكد من استقرار النظام ووظائفه وصحته التشغيلية.
 
-## Objectives
-- Verify successful deployment.
-- Confirm critical business workflows.
-- Detect issues early.
-- Ensure monitoring and alerting operate correctly.
+## الأهداف
+- التحقق من نجاح النشر.
+- تأكيد تدفقات العمل الحرجة.
+- اكتشاف المشكلات مبكرًا.
+- التأكد من عمل المراقبة والتنبيهات بشكل صحيح.
 
-## Validation Checklist
-- Smoke tests completed.
-- Critical user journeys verified.
-- Application logs reviewed.
-- Error rates within acceptable thresholds.
-- Performance metrics validated.
-- Monitoring dashboards healthy.
+## قائمة تحقق التحقق
+- اكتمال اختبارات Smoke.
+- التحقق من رحلات المستخدم الحرجة.
+- مراجعة سجلات التطبيق.
+- معدلات الأخطاء ضمن الحدود المقبولة.
+- التحقق من مؤشرات الأداء.
+- سلامة لوحات المراقبة.
 
-## Incident Handling
-1. Detect issue.
-2. Assess severity.
-3. Mitigate or rollback if required.
-4. Record findings.
-5. Schedule follow-up improvements.
+## التعامل مع الحوادث
+1. اكتشاف المشكلة.
+2. تقييم الخطورة.
+3. المعالجة أو التراجع عند الحاجة.
+4. تسجيل النتائج.
+5. جدولة تحسينات المتابعة.
 
-## Success Criteria
-- Every production release includes post-release validation.
-- Critical issues are identified quickly.
-- Validation results are documented and retained.
+## معايير النجاح
+- تضمين كل إصدار إنتاجي للتحقق بعد الإصدار.
+- اكتشاف المشكلات الحرجة بسرعة.
+- توثيق نتائج التحقق والاحتفاظ بها.

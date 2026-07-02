@@ -1,29 +1,29 @@
 # Quality Metrics
 
-## Purpose
-Define the key quality indicators used to measure the health and effectiveness of the EduCore development process and product quality.
+## الهدف
+تحديد مؤشرات الجودة الرئيسية المستخدمة لقياس صحة عملية التطوير وجودة منتج EduCore.
 
-## Metrics
-- Test coverage
-- Defect density
-- Escaped defects
-- Build success rate
-- Mean time to resolution (MTTR)
-- Test execution success rate
-- Release frequency
+## المؤشرات
+- تغطية الاختبارات (Test Coverage).
+- كثافة العيوب (Defect Density).
+- العيوب المتسربة للإنتاج (Escaped Defects).
+- معدل نجاح البناء (Build Success Rate).
+- متوسط زمن الحل (MTTR).
+- معدل نجاح تنفيذ الاختبارات.
+- تكرار الإصدارات (Release Frequency).
 
-## Measurement Principles
-- Track trends over time.
-- Use consistent definitions.
-- Review metrics regularly.
-- Focus on continuous improvement.
+## مبادئ القياس
+- تتبع الاتجاهات عبر الزمن.
+- استخدام تعريفات موحدة وثابتة.
+- مراجعة المؤشرات بشكل دوري.
+- التركيز على التحسين المستمر.
 
-## Reporting
-- CI/CD dashboards
-- Sprint quality reports
-- Release readiness reports
+## التقارير
+- لوحات معلومات CI/CD.
+- تقارير جودة السبرنت.
+- تقارير جاهزية الإصدار.
 
-## Success Criteria
-- Metrics are collected automatically where possible.
-- Quality goals are reviewed periodically.
-- Continuous improvement actions are documented.
+## معايير النجاح
+- جمع المؤشرات آليًا قدر الإمكان.
+- مراجعة أهداف الجودة دوريًا.
+- توثيق إجراءات التحسين المستمر.

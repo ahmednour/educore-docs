@@ -1,29 +1,29 @@
 # Performance Testing
 
-## Purpose
-Define the approach for validating EduCore performance under expected and peak workloads.
+## الهدف
+تحديد منهجية التحقق من أداء EduCore تحت أحمال التشغيل المتوقعة وأحمال الذروة.
 
-## Scope
-- Load testing
-- Stress testing
-- Spike testing
-- Endurance testing
-- Scalability testing
+## النطاق
+- Load Testing
+- Stress Testing
+- Spike Testing
+- Endurance Testing
+- Scalability Testing
 
-## Key Metrics
-- Response time
-- Throughput
-- Error rate
-- CPU and memory utilization
-- Concurrent user capacity
+## المؤشرات الرئيسية
+- زمن الاستجابة (Response Time).
+- الإنتاجية (Throughput).
+- معدل الأخطاء (Error Rate).
+- استهلاك المعالج والذاكرة (CPU / Memory Utilization).
+- سعة المستخدمين المتزامنين (Concurrent User Capacity).
 
-## Principles
-- Use production-like environments.
-- Simulate realistic user behavior.
-- Monitor infrastructure during execution.
-- Analyze bottlenecks and document findings.
+## المبادئ
+- استخدام بيئات مطابقة للإنتاج قدر الإمكان.
+- محاكاة سلوك مستخدم واقعي.
+- مراقبة البنية التحتية أثناء التنفيذ.
+- تحليل نقاط الاختناق وتوثيق النتائج.
 
-## Success Criteria
-- Performance targets are achieved.
-- No critical bottlenecks remain.
-- System remains stable under target load.
+## معايير النجاح
+- تحقيق أهداف الأداء المحددة.
+- عدم وجود نقاط اختناق حرجة متبقية.
+- استقرار النظام تحت الحمل المستهدف.

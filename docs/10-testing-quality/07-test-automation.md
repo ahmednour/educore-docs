@@ -1,28 +1,28 @@
 # Test Automation
 
-## Purpose
-Define the automated testing approach for EduCore to improve reliability, repeatability, and release confidence.
+## الهدف
+تحديد منهجية أتمتة الاختبارات في EduCore لتحسين الموثوقية وقابلية التكرار والثقة في الإصدارات.
 
-## Scope
-- Automated unit tests
-- Automated integration tests
-- End-to-end automation
-- Regression test suites
-- CI/CD execution
+## النطاق
+- اختبارات الوحدة الآلية (Automated Unit Tests).
+- اختبارات التكامل الآلية.
+- أتمتة اختبارات End-to-End.
+- مجموعات اختبارات الانحدار (Regression Suites).
+- التنفيذ ضمن CI/CD.
 
-## Principles
-- Run tests automatically on every change.
-- Keep automated tests deterministic.
-- Maintain fast feedback for developers.
-- Review and update tests alongside application changes.
+## المبادئ
+- تشغيل الاختبارات آليًا مع كل تغيير.
+- الحفاظ على نتائج ثابتة وغير عشوائية (Deterministic).
+- الحفاظ على سرعة التغذية الراجعة للمطورين.
+- مراجعة وتحديث الاختبارات مع كل تغيير في التطبيق.
 
-## Tooling
-- CI pipeline integration
-- Test reporting
-- Code coverage reporting
-- Artifact retention
+## الأدوات
+- التكامل مع خط CI.
+- تقارير الاختبارات.
+- تقارير تغطية الكود (Code Coverage).
+- الاحتفاظ بمخرجات التنفيذ (Artifacts).
 
-## Success Criteria
-- Automated tests execute successfully in CI.
-- Regression defects are detected early.
-- Test execution results are visible to the team.
+## معايير النجاح
+- نجاح تنفيذ الاختبارات الآلية ضمن CI.
+- اكتشاف عيوب الانحدار مبكرًا.
+- وضوح نتائج التنفيذ لكل الفريق.

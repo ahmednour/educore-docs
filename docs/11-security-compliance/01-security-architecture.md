@@ -1,31 +1,31 @@
 # Security Architecture
 
-## Purpose
-Document the high-level security architecture for EduCore and define the primary security controls applied across the platform.
+## الهدف
+توثيق المعمارية الأمنية العامة لنظام EduCore وتحديد الضوابط الأمنية الأساسية المطبقة عبر المنصة.
 
-## Objectives
-- Protect sensitive data.
-- Enforce strong authentication and authorization.
-- Reduce attack surface.
-- Support compliance requirements.
-- Enable continuous monitoring.
+## الأهداف
+- حماية البيانات الحساسة.
+- فرض مصادقة وتفويض قويين.
+- تقليل سطح الهجوم.
+- دعم متطلبات الامتثال.
+- تمكين المراقبة المستمرة.
 
-## Security Layers
-- Identity and Access Management
-- Network Security
-- Application Security
-- Data Protection
-- Logging and Monitoring
-- Infrastructure Security
+## الطبقات الأمنية
+- إدارة الهوية والوصول (IAM).
+- أمان الشبكة.
+- أمان التطبيق.
+- حماية البيانات.
+- التسجيل والمراقبة.
+- أمان البنية التحتية.
 
-## Core Principles
-- Least privilege
-- Defense in depth
-- Secure by default
-- Zero Trust
-- Auditability
+## المبادئ الأساسية
+- مبدأ أقل الصلاحيات (Least Privilege).
+- الدفاع متعدد الطبقات (Defense in Depth).
+- الأمان الافتراضي (Secure by Default).
+- Zero Trust.
+- قابلية التدقيق (Auditability).
 
-## Success Criteria
-- Security controls are consistently applied.
-- High-risk assets receive additional protection.
-- Security architecture is reviewed regularly.
+## معايير النجاح
+- تطبيق الضوابط الأمنية باستمرار.
+- حصول الأصول عالية الخطورة على حماية إضافية.
+- مراجعة المعمارية الأمنية بشكل دوري.

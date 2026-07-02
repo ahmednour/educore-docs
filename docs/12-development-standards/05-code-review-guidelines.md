@@ -1,29 +1,29 @@
 # Code Review Guidelines
 
-## Purpose
-Define the code review process for EduCore to improve code quality, maintainability, knowledge sharing, and consistency.
+## الهدف
+تحديد عملية مراجعة الكود في EduCore لتحسين الجودة وسهولة الصيانة ونقل المعرفة والاتساق.
 
-## Objectives
-- Detect defects early.
-- Ensure compliance with coding standards.
-- Encourage knowledge sharing.
-- Improve long-term maintainability.
+## الأهداف
+- اكتشاف العيوب مبكرًا.
+- ضمان الالتزام بمعايير الكتابة البرمجية.
+- تشجيع نقل المعرفة بين الفريق.
+- تحسين قابلية الصيانة طويلة المدى.
 
-## Review Checklist
-- Code is readable and well-structured.
-- Business requirements are implemented correctly.
-- Tests are included or updated.
-- Documentation is updated where needed.
-- No obvious performance or reliability concerns.
+## قائمة تحقق المراجعة
+- الكود واضح ومنظم جيدًا.
+- تنفيذ متطلبات العمل بشكل صحيح.
+- وجود اختبارات مضافة أو محدثة.
+- تحديث التوثيق عند الحاجة.
+- عدم وجود مخاوف واضحة تتعلق بالأداء أو الموثوقية.
 
-## Review Process
-1. Open a pull request.
-2. Complete automated checks.
-3. Review by at least one qualified reviewer.
-4. Address review feedback.
-5. Merge after approval.
+## عملية المراجعة
+1. فتح Pull Request.
+2. اكتمال الفحوصات الآلية.
+3. مراجعة من مراجع مؤهل واحد على الأقل.
+4. معالجة ملاحظات المراجعة.
+5. الدمج بعد الاعتماد.
 
-## Success Criteria
-- All changes are reviewed before merging.
-- Review feedback is resolved.
-- Review turnaround time is monitored.
+## معايير النجاح
+- مراجعة كل التغييرات قبل الدمج.
+- حل ملاحظات المراجعة.
+- مراقبة زمن دورة المراجعة.

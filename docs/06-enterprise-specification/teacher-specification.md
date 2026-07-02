@@ -30,7 +30,7 @@
 - GET /teachers/{id}
 - POST /teachers
 - PUT /teachers/{id}
-- DELETE /teachers/{id}
+- DELETE /teachers/{id} — تعطيل (Deactivate) وليس حذف فعلي إذا وُجدت بيانات تشغيلية (BR-0704)
 
 ## UI Requirements
 - قائمة المعلمين.

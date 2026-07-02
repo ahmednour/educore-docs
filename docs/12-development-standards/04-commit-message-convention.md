@@ -1,14 +1,14 @@
 # Commit Message Convention
 
-## Purpose
-Define a consistent commit message format for EduCore to improve traceability, readability, and release management.
+## الهدف
+تحديد صيغة موحدة لرسائل الـ Commit في EduCore لتحسين قابلية التتبع والقراءة وإدارة الإصدارات.
 
-## Format
+## الصيغة
 ```
-<type>(<scope>): <short summary>
+<type>(<scope>): <ملخص مختصر>
 ```
 
-## Common Types
+## الأنواع الشائعة
 - feat
 - fix
 - docs
@@ -19,17 +19,17 @@ Define a consistent commit message format for EduCore to improve traceability, r
 - perf
 - build
 
-## Guidelines
-- Use the imperative mood.
-- Keep the summary concise.
-- Reference issues when applicable.
-- Describe breaking changes in the commit body when necessary.
+## الإرشادات
+- استخدام صيغة الأمر المباشر (Imperative Mood).
+- إبقاء الملخص مختصرًا.
+- الإشارة إلى رقم المهمة (Issue) عند الحاجة.
+- وصف التغييرات الجذرية (Breaking Changes) في نص الـ Commit عند الحاجة.
 
-## Examples
+## أمثلة
 - feat(auth): add password reset flow
 - fix(api): handle expired access tokens
 - docs(readme): update setup instructions
 
-## Success Criteria
-- All commits follow the agreed convention.
-- Commit history remains clear and searchable.
+## معايير النجاح
+- التزام جميع الـ Commits بالاصطلاح المتفق عليه.
+- بقاء سجل الـ Commits واضحًا وقابلًا للبحث.

@@ -1,9 +1,9 @@
 # Development Standards
 
-## Purpose
-This section defines the engineering standards and development practices for EduCore to ensure consistency, maintainability, and high-quality software delivery.
+## الهدف
+يحدد هذا القسم المعايير الهندسية وممارسات التطوير في EduCore لضمان الاتساق وسهولة الصيانة وتسليم برمجي عالي الجودة.
 
-## Sections
+## الأقسام
 1. Coding Standards
 2. Git Workflow
 3. Branching Strategy
@@ -13,4 +13,4 @@ This section defines the engineering standards and development practices for Edu
 7. Dependency Management
 8. Definition of Done
 
-> Each topic will be documented in a dedicated file.
+> سيتم توثيق كل موضوع في ملف مستقل.

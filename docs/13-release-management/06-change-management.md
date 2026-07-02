@@ -1,28 +1,28 @@
 # Change Management
 
-## Purpose
-Define the process for planning, reviewing, approving, implementing, and documenting changes within EduCore.
+## الهدف
+تحديد عملية التخطيط والمراجعة والاعتماد والتنفيذ والتوثيق للتغييرات داخل EduCore.
 
-## Objectives
-- Minimize operational risk.
-- Ensure changes are reviewed before implementation.
-- Maintain traceability.
-- Reduce service disruption.
+## الأهداف
+- تقليل المخاطر التشغيلية.
+- ضمان مراجعة التغييرات قبل التنفيذ.
+- الحفاظ على قابلية التتبع.
+- تقليل انقطاع الخدمة.
 
-## Change Process
-1. Submit change request.
-2. Assess impact and risk.
-3. Review and approve.
-4. Schedule implementation.
-5. Execute and validate.
-6. Document outcomes.
+## عملية التغيير
+1. تقديم طلب التغيير.
+2. تقييم الأثر والمخاطر.
+3. المراجعة والاعتماد.
+4. جدولة التنفيذ.
+5. التنفيذ والتحقق.
+6. توثيق النتائج.
 
-## Change Categories
-- Standard changes
-- Normal changes
-- Emergency changes
+## فئات التغيير
+- تغييرات قياسية (Standard).
+- تغييرات عادية (Normal).
+- تغييرات طارئة (Emergency).
 
-## Success Criteria
-- Changes are approved before implementation.
-- High-risk changes include rollback plans.
-- Change history is documented and auditable.
+## معايير النجاح
+- اعتماد التغييرات قبل التنفيذ.
+- تضمين التغييرات عالية الخطورة خطة تراجع.
+- توثيق سجل التغييرات وقابليته للتدقيق.

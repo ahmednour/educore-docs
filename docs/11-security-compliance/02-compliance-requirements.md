@@ -1,29 +1,29 @@
 # Compliance Requirements
 
-## Purpose
-Document the compliance requirements applicable to EduCore and define the controls needed to support regulatory and organizational obligations.
+## الهدف
+توثيق متطلبات الامتثال المطبقة على EduCore وتحديد الضوابط اللازمة لدعم الالتزامات التنظيمية والمؤسسية.
 
-## Objectives
-- Identify applicable compliance frameworks.
-- Define required administrative and technical controls.
-- Support audit readiness.
-- Maintain compliance evidence.
+## الأهداف
+- تحديد أطر الامتثال المطبقة.
+- تحديد الضوابط الإدارية والتقنية المطلوبة.
+- دعم الجاهزية للتدقيق.
+- الحفاظ على أدلة الامتثال.
 
-## Scope
-- Data governance
-- Access management
-- Audit logging
-- Record retention
-- Change management
-- Third-party services
+## النطاق
+- حوكمة البيانات.
+- إدارة الوصول.
+- سجلات التدقيق (Audit Logging).
+- الاحتفاظ بالسجلات.
+- إدارة التغيير.
+- الخدمات الخارجية (Third-Party Services).
 
-## Compliance Activities
-- Periodic compliance reviews
-- Internal assessments
-- Documentation updates
-- Corrective action tracking
+## أنشطة الامتثال
+- مراجعات دورية للامتثال.
+- تقييمات داخلية.
+- تحديث الوثائق.
+- متابعة الإجراءات التصحيحية.
 
-## Success Criteria
-- Compliance requirements are documented.
-- Required controls are implemented.
-- Audit evidence is maintained and reviewed regularly.
+## معايير النجاح
+- توثيق متطلبات الامتثال.
+- تطبيق الضوابط المطلوبة.
+- الحفاظ على أدلة التدقيق ومراجعتها دوريًا.

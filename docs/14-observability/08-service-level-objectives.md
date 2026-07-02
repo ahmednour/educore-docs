@@ -1,28 +1,28 @@
 # Service Level Objectives (SLOs)
 
-## Purpose
-Define Service Level Objectives (SLOs) for EduCore to establish measurable reliability targets and guide operational improvements.
+## الهدف
+تحديد أهداف مستوى الخدمة (SLOs) في EduCore لوضع أهداف موثوقية قابلة للقياس وتوجيه التحسينات التشغيلية.
 
-## Objectives
-- Define measurable reliability goals.
-- Align operational expectations.
-- Support continuous improvement.
-- Drive error budget management.
+## الأهداف
+- تحديد أهداف موثوقية قابلة للقياس.
+- مواءمة التوقعات التشغيلية.
+- دعم التحسين المستمر.
+- إدارة ميزانية الخطأ (Error Budget).
 
-## Core SLO Categories
-- Availability
-- Latency
-- Error Rate
-- Throughput
-- Recovery Time
+## فئات SLO الأساسية
+- التوفر (Availability)
+- زمن الاستجابة (Latency)
+- معدل الأخطاء (Error Rate)
+- الإنتاجية (Throughput)
+- زمن الاستعادة (Recovery Time)
 
-## Guidelines
-- Define Service Level Indicators (SLIs) for each critical service.
-- Establish realistic targets.
-- Review SLO performance regularly.
-- Investigate repeated SLO violations.
+## الإرشادات
+- تحديد مؤشرات مستوى الخدمة (SLIs) لكل خدمة حرجة.
+- وضع أهداف واقعية.
+- مراجعة أداء SLO بشكل دوري.
+- التحقيق في أي مخالفات متكررة لـ SLO.
 
-## Success Criteria
-- Critical services have documented SLOs.
-- SLO performance is continuously monitored.
-- Reliability targets influence engineering priorities.
+## معايير النجاح
+- امتلاك الخدمات الحرجة لأهداف SLO موثقة.
+- مراقبة أداء SLO باستمرار.
+- تأثير أهداف الموثوقية على أولويات الهندسة.

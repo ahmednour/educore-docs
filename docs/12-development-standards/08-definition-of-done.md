@@ -1,25 +1,25 @@
 # Definition of Done
 
-## Purpose
-Define the minimum completion criteria that every EduCore work item must satisfy before it is considered complete.
+## الهدف
+تحديد الحد الأدنى من معايير الاكتمال التي يجب أن تحققها أي مهمة عمل في EduCore قبل اعتبارها منجزة.
 
-## Functional Requirements
-- Acceptance criteria are met.
-- Required functionality is implemented.
-- Edge cases are considered.
+## المتطلبات الوظيفية
+- تحقق معايير القبول.
+- تنفيذ الوظائف المطلوبة.
+- مراعاة الحالات الحدّية (Edge Cases).
 
-## Quality Requirements
-- Code follows project standards.
-- Required tests pass.
-- Documentation is updated.
-- Code review is completed.
+## متطلبات الجودة
+- الكود يتبع معايير المشروع.
+- نجاح الاختبارات المطلوبة.
+- تحديث التوثيق.
+- اكتمال مراجعة الكود.
 
-## Release Readiness
-- No critical known issues remain.
-- Build pipeline succeeds.
-- Required approvals are completed.
+## الجاهزية للإصدار
+- عدم وجود مشاكل حرجة معروفة.
+- نجاح خط البناء (Build Pipeline).
+- اكتمال الموافقات المطلوبة.
 
-## Success Criteria
-- Teams apply the same completion standard.
-- Work items are consistently releasable.
-- Quality expectations are transparent.
+## معايير النجاح
+- تطبيق الفرق لنفس معيار الاكتمال.
+- كون المهام قابلة للإصدار باستمرار.
+- شفافية توقعات الجودة.

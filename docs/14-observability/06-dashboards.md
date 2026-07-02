@@ -1,28 +1,28 @@
 # Dashboards
 
-## Purpose
-Define dashboard standards for EduCore to provide clear, real-time visibility into system health, performance, and business operations.
+## الهدف
+تحديد معايير لوحات المعلومات في EduCore لتوفير رؤية واضحة ولحظية لصحة النظام وأدائه وعملياته التجارية.
 
-## Objectives
-- Present actionable operational insights.
-- Support rapid incident investigation.
-- Track business and technical KPIs.
-- Provide role-specific views.
+## الأهداف
+- عرض رؤى تشغيلية قابلة للتنفيذ.
+- دعم التحقيق السريع في الحوادث.
+- متابعة مؤشرات الأداء الفنية والتجارية (KPIs).
+- توفير عروض مخصصة حسب الدور الوظيفي.
 
-## Dashboard Categories
-- Executive dashboards
-- Operational dashboards
-- Infrastructure dashboards
-- Application dashboards
-- Business dashboards
+## فئات اللوحات
+- لوحات تنفيذية (Executive).
+- لوحات تشغيلية.
+- لوحات البنية التحتية.
+- لوحات التطبيق.
+- لوحات الأعمال.
 
-## Guidelines
-- Display only meaningful metrics.
-- Keep dashboards easy to interpret.
-- Use consistent naming and layout.
-- Review dashboards regularly.
+## الإرشادات
+- عرض المقاييس ذات المعنى فقط.
+- إبقاء اللوحات سهلة الفهم.
+- استخدام تسمية وتخطيط متسقين.
+- مراجعة اللوحات بشكل دوري.
 
-## Success Criteria
-- Dashboards reflect current system state.
-- Critical KPIs are visible.
-- Teams rely on dashboards for operational decisions.
+## معايير النجاح
+- عكس اللوحات لحالة النظام الحالية.
+- ظهور مؤشرات الأداء الحرجة بوضوح.
+- اعتماد الفرق على اللوحات لاتخاذ القرارات التشغيلية.

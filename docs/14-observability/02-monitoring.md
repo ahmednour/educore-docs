@@ -1,29 +1,29 @@
 # Monitoring
 
-## Purpose
-Define the monitoring strategy for EduCore to continuously observe system health, detect anomalies, and support reliable operations.
+## الهدف
+تحديد استراتيجية المراقبة في EduCore لمتابعة صحة النظام باستمرار واكتشاف الأعطال ودعم تشغيل موثوق.
 
-## Objectives
-- Monitor application availability.
-- Detect failures quickly.
-- Track infrastructure health.
-- Support proactive operations.
+## الأهداف
+- مراقبة توفر التطبيق (Availability).
+- اكتشاف الأعطال بسرعة.
+- متابعة صحة البنية التحتية.
+- دعم التشغيل الاستباقي.
 
-## Monitoring Scope
-- Application services
-- APIs
-- Databases
-- Infrastructure
-- Background jobs
-- External integrations
+## نطاق المراقبة
+- خدمات التطبيق.
+- واجهات API.
+- قواعد البيانات.
+- البنية التحتية.
+- المهام الخلفية (Background Jobs).
+- التكاملات الخارجية.
 
-## Guidelines
-- Monitor critical business services.
-- Define health checks.
-- Continuously validate monitoring coverage.
-- Review monitoring rules periodically.
+## الإرشادات
+- مراقبة الخدمات الحرجة للأعمال.
+- تحديد فحوصات الصحة (Health Checks).
+- التحقق المستمر من تغطية المراقبة.
+- مراجعة قواعد المراقبة بشكل دوري.
 
-## Success Criteria
-- Critical services are continuously monitored.
-- Monitoring detects operational issues promptly.
-- Monitoring coverage is reviewed regularly.
+## معايير النجاح
+- مراقبة مستمرة للخدمات الحرجة.
+- اكتشاف المشكلات التشغيلية بسرعة.
+- مراجعة تغطية المراقبة بانتظام.

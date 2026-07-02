@@ -1,9 +1,9 @@
 # Observability
 
-## Purpose
-This section defines the observability strategy for EduCore to ensure system health, rapid incident detection, effective troubleshooting, and operational insights.
+## الهدف
+يحدد هذا القسم استراتيجية المراقبة والرصد (Observability) في EduCore لضمان صحة النظام والاكتشاف السريع للحوادث وتحليل فعّال للأعطال ورؤى تشغيلية واضحة.
 
-## Sections
+## الأقسام
 1. Logging Strategy
 2. Monitoring
 3. Metrics
@@ -13,4 +13,4 @@ This section defines the observability strategy for EduCore to ensure system hea
 7. Incident Response
 8. Service Level Objectives (SLOs)
 
-> Each topic will be documented in a dedicated file.
+> سيتم توثيق كل موضوع في ملف مستقل.

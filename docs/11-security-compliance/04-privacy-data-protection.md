@@ -1,29 +1,29 @@
 # Privacy & Data Protection
 
-## Purpose
-Document the privacy principles and data protection practices adopted by EduCore throughout the information lifecycle.
+## الهدف
+توثيق مبادئ الخصوصية وممارسات حماية البيانات المعتمدة في EduCore عبر دورة حياة المعلومات.
 
-## Objectives
-- Protect personal information.
-- Minimize unnecessary data collection.
-- Define retention and disposal rules.
-- Support applicable privacy obligations.
+## الأهداف
+- حماية المعلومات الشخصية.
+- تقليل جمع البيانات غير الضروري.
+- تحديد قواعد الاحتفاظ والإتلاف.
+- دعم متطلبات الخصوصية المطبقة.
 
-## Scope
-- Data collection
-- Data storage
-- Data sharing
-- Data retention
-- Data disposal
+## النطاق
+- جمع البيانات.
+- تخزين البيانات.
+- مشاركة البيانات.
+- الاحتفاظ بالبيانات.
+- إتلاف البيانات.
 
-## Principles
-- Data minimization
-- Purpose limitation
-- Accuracy
-- Confidentiality
-- Accountability
+## المبادئ
+- تقليل البيانات (Data Minimization).
+- تحديد الغرض (Purpose Limitation).
+- الدقة.
+- السرية.
+- المساءلة (Accountability).
 
-## Success Criteria
-- Personal data handling is documented.
-- Retention rules are defined.
-- Privacy requirements are reviewed periodically.
+## معايير النجاح
+- توثيق كيفية التعامل مع البيانات الشخصية.
+- تحديد قواعد الاحتفاظ.
+- مراجعة متطلبات الخصوصية بشكل دوري.

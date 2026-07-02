@@ -25,7 +25,7 @@
 - GET /exams
 - POST /exams
 - PUT /exams/{id}
-- DELETE /exams/{id}
+- DELETE /exams/{id} — مسموح فقط قبل اعتماد النتائج (BR-1404)، وبعدها يُستخدم الإلغاء
 
 ## Acceptance Criteria
 - إنشاء اختبار بنجاح.

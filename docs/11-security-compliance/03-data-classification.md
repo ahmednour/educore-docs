@@ -1,27 +1,27 @@
 # Data Classification
 
-## Purpose
-Define the data classification model used by EduCore to ensure information is handled according to its sensitivity and business value.
+## الهدف
+تحديد نموذج تصنيف البيانات المستخدم في EduCore لضمان التعامل مع المعلومات وفق حساسيتها وقيمتها للأعمال.
 
-## Classification Levels
-- Public
-- Internal
-- Confidential
-- Restricted
+## مستويات التصنيف
+- عام (Public)
+- داخلي (Internal)
+- سري (Confidential)
+- مقيد (Restricted)
 
-## Handling Requirements
-- Define storage requirements for each classification.
-- Define transmission requirements.
-- Apply appropriate access controls.
-- Define retention and disposal rules.
+## متطلبات التعامل
+- تحديد متطلبات التخزين لكل مستوى تصنيف.
+- تحديد متطلبات النقل والإرسال.
+- تطبيق ضوابط وصول مناسبة.
+- تحديد قواعد الاحتفاظ والإتلاف.
 
-## Responsibilities
-- Data Owners
-- System Administrators
-- Application Teams
-- Compliance Team
+## المسؤوليات
+- مالكو البيانات (Data Owners).
+- مسؤولو النظام.
+- فرق التطبيقات.
+- فريق الامتثال.
 
-## Success Criteria
-- All critical data is classified.
-- Handling requirements are documented.
-- Access controls align with data classification.
+## معايير النجاح
+- تصنيف جميع البيانات الحرجة.
+- توثيق متطلبات التعامل مع كل مستوى.
+- توافق ضوابط الوصول مع تصنيف البيانات.

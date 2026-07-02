@@ -1,28 +1,28 @@
 # Alerting
 
-## Purpose
-Define the alerting strategy for EduCore to ensure operational issues are detected promptly and routed to the appropriate responders.
+## الهدف
+تحديد استراتيجية التنبيهات في EduCore لضمان اكتشاف المشكلات التشغيلية بسرعة وتوجيهها للمسؤولين المناسبين.
 
-## Objectives
-- Detect critical failures quickly.
-- Minimize alert fatigue.
-- Prioritize actionable alerts.
-- Support rapid incident response.
+## الأهداف
+- اكتشاف الأعطال الحرجة بسرعة.
+- تقليل إجهاد التنبيهات (Alert Fatigue).
+- إعطاء الأولوية للتنبيهات القابلة للتنفيذ.
+- دعم الاستجابة السريعة للحوادث.
 
-## Alert Categories
-- Availability
-- Performance
-- Security
-- Infrastructure
-- Business-critical events
+## فئات التنبيهات
+- التوفر
+- الأداء
+- الأمان
+- البنية التحتية
+- الأحداث الحرجة للأعمال
 
-## Guidelines
-- Alert only on actionable conditions.
-- Define severity levels.
-- Assign ownership for every alert.
-- Regularly review and tune alert rules.
+## الإرشادات
+- التنبيه فقط على الحالات القابلة للتنفيذ.
+- تحديد مستويات الخطورة.
+- تعيين مسؤول لكل تنبيه.
+- مراجعة وضبط قواعد التنبيه بشكل دوري.
 
-## Success Criteria
-- Critical alerts reach the correct responders.
-- False positives are minimized.
-- Alert response times are monitored and improved.
+## معايير النجاح
+- وصول التنبيهات الحرجة للمسؤولين الصحيحين.
+- تقليل الإنذارات الكاذبة.
+- مراقبة وتحسين زمن الاستجابة للتنبيهات.

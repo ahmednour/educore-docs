@@ -1,26 +1,26 @@
 # Versioning Policy
 
-## Purpose
-Define the versioning policy used by EduCore to ensure releases are identifiable, predictable, and easy to communicate.
+## الهدف
+تحديد سياسة ترقيم الإصدارات في EduCore لضمان كون الإصدارات قابلة للتمييز والتوقع وسهلة التواصل بشأنها.
 
-## Version Format
-EduCore follows Semantic Versioning:
+## صيغة الإصدار
+يتبع EduCore نظام Semantic Versioning:
 
 ```
 MAJOR.MINOR.PATCH
 ```
 
-## Version Rules
-- Increment **MAJOR** for incompatible changes.
-- Increment **MINOR** for backward-compatible features.
-- Increment **PATCH** for backward-compatible fixes.
+## قواعد الترقيم
+- زيادة **MAJOR** عند وجود تغييرات غير متوافقة.
+- زيادة **MINOR** عند إضافة ميزات متوافقة مع الإصدارات السابقة.
+- زيادة **PATCH** عند إصلاحات متوافقة مع الإصدارات السابقة.
 
-## Release Tags
-- Tag every production release.
-- Keep release history immutable.
-- Document significant changes in release notes.
+## وسوم الإصدار (Tags)
+- وضع Tag لكل إصدار إنتاجي.
+- الحفاظ على سجل الإصدارات دون تعديل (Immutable).
+- توثيق التغييرات المهمة في Release Notes.
 
-## Success Criteria
-- Every release has a unique version.
-- Version numbers reflect change impact.
-- Version history is traceable.
+## معايير النجاح
+- امتلاك كل إصدار رقمًا فريدًا.
+- عكس أرقام الإصدارات لحجم التغيير الفعلي.
+- قابلية تتبع سجل الإصدارات.

@@ -1,23 +1,23 @@
 # Application Verification
 
-## Purpose
-Define verification activities that help ensure EduCore is ready for production from a quality perspective.
+## الهدف
+تحديد أنشطة التحقق التي تضمن جاهزية EduCore للإنتاج من ناحية الجودة.
 
-## Scope
-- Login and access validation
-- Input handling verification
-- Session lifecycle checks
-- API behavior validation
-- Dependency health review
-- Release readiness review
+## النطاق
+- التحقق من تسجيل الدخول والوصول.
+- التحقق من معالجة المدخلات.
+- فحص دورة حياة الجلسة (Session Lifecycle).
+- التحقق من سلوك واجهات API.
+- مراجعة صحة التبعيات (Dependencies).
+- مراجعة الجاهزية للإصدار.
 
-## Activities
-- Automated code analysis
-- Runtime behavior verification
-- Dependency review
-- Manual checklist execution
+## الأنشطة
+- التحليل الآلي للكود (Automated Code Analysis).
+- التحقق من سلوك النظام أثناء التشغيل.
+- مراجعة التبعيات.
+- تنفيذ قوائم تحقق يدوية.
 
-## Success Criteria
-- High-priority findings are resolved before release.
-- Verification results are documented.
-- Verification is included in the release pipeline.
+## معايير النجاح
+- معالجة الملاحظات عالية الأولوية قبل الإصدار.
+- توثيق نتائج التحقق.
+- إدراج التحقق ضمن خط الإصدار (Release Pipeline).

@@ -32,7 +32,7 @@
 - GET /enrollments/{id}
 - POST /enrollments
 - PUT /enrollments/{id}
-- DELETE /enrollments/{id}
+- DELETE /enrollments/{id} — لا يحذف السجل، يحوّل الحالة إلى Withdrawn طبقاً لـ BR-1004
 
 ## UI Requirements
 - قائمة التسجيلات.

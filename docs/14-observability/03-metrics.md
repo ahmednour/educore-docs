@@ -1,29 +1,29 @@
 # Metrics
 
-## Purpose
-Define the metrics strategy for EduCore to measure system performance, reliability, capacity, and business health.
+## الهدف
+تحديد استراتيجية المقاييس في EduCore لقياس الأداء والموثوقية والسعة والصحة التجارية للنظام.
 
-## Objectives
-- Measure application health.
-- Track infrastructure performance.
-- Support capacity planning.
-- Enable data-driven operational decisions.
+## الأهداف
+- قياس صحة التطبيق.
+- متابعة أداء البنية التحتية.
+- دعم تخطيط السعة (Capacity Planning).
+- تمكين قرارات تشغيلية مبنية على البيانات.
 
-## Metric Categories
-- Availability
-- Latency
-- Throughput
-- Error Rate
-- Resource Utilization
-- Business Metrics
+## فئات المقاييس
+- التوفر (Availability)
+- زمن الاستجابة (Latency)
+- الإنتاجية (Throughput)
+- معدل الأخطاء (Error Rate)
+- استخدام الموارد (Resource Utilization)
+- مقاييس الأعمال (Business Metrics)
 
-## Guidelines
-- Prefer meaningful, actionable metrics.
-- Define metric ownership.
-- Establish collection intervals.
-- Review metrics regularly.
+## الإرشادات
+- تفضيل المقاييس ذات المعنى والقابلة للتنفيذ.
+- تحديد مالك لكل مقياس.
+- تحديد فترات الجمع.
+- مراجعة المقاييس بانتظام.
 
-## Success Criteria
-- Critical services expose key metrics.
-- Metrics support proactive operations.
-- Historical trends are retained for analysis.
+## معايير النجاح
+- عرض الخدمات الحرجة لمقاييسها الأساسية.
+- دعم المقاييس للتشغيل الاستباقي.
+- الاحتفاظ بالاتجاهات التاريخية للتحليل.

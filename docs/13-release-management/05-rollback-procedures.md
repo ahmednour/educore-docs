@@ -1,29 +1,29 @@
 # Rollback Procedures
 
-## Purpose
-Define the standard rollback process for EduCore to restore service quickly and safely if a production release causes unexpected issues.
+## الهدف
+تحديد إجراء التراجع القياسي في EduCore لاستعادة الخدمة بسرعة وأمان في حال تسبب إصدار إنتاجي في مشاكل غير متوقعة.
 
-## Objectives
-- Minimize downtime.
-- Protect data integrity.
-- Restore stable service rapidly.
-- Document rollback decisions.
+## الأهداف
+- تقليل زمن التوقف.
+- حماية سلامة البيانات.
+- استعادة استقرار الخدمة بسرعة.
+- توثيق قرارات التراجع.
 
-## Rollback Process
-1. Detect production issue.
-2. Assess impact.
-3. Approve rollback.
-4. Execute rollback plan.
-5. Verify system health.
-6. Perform root cause analysis.
+## عملية التراجع
+1. اكتشاف المشكلة في الإنتاج.
+2. تقييم الأثر.
+3. اعتماد التراجع.
+4. تنفيذ خطة التراجع.
+5. التحقق من صحة النظام.
+6. تحليل السبب الجذري (Root Cause Analysis).
 
-## Requirements
-- Tested rollback procedures.
-- Backup availability.
-- Monitoring during rollback.
-- Stakeholder communication.
+## المتطلبات
+- إجراءات تراجع مُختبرة مسبقًا.
+- توفر نسخ احتياطية.
+- المراقبة أثناء التراجع.
+- التواصل مع أصحاب المصلحة.
 
-## Success Criteria
-- Rollbacks are predictable and documented.
-- Service is restored within agreed objectives.
-- Lessons learned are recorded.
+## معايير النجاح
+- كون عمليات التراجع متوقعة وموثقة.
+- استعادة الخدمة ضمن الأهداف المتفق عليها.
+- تسجيل الدروس المستفادة.

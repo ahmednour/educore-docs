@@ -1,27 +1,27 @@
 # Risk Management
 
-## Purpose
-Document the process for identifying, evaluating, treating, and monitoring risks throughout the EduCore project lifecycle.
+## الهدف
+توثيق عملية تحديد وتقييم ومعالجة ومتابعة المخاطر عبر دورة حياة مشروع EduCore.
 
-## Objectives
-- Identify project and operational risks.
-- Assess likelihood and impact.
-- Define mitigation and contingency actions.
-- Review risks regularly.
+## الأهداف
+- تحديد المخاطر المشروعية والتشغيلية.
+- تقييم الاحتمالية والأثر.
+- تحديد إجراءات التخفيف والطوارئ.
+- المراجعة الدورية للمخاطر.
 
-## Risk Process
-1. Risk identification
-2. Risk assessment
-3. Risk prioritization
-4. Mitigation planning
-5. Monitoring and review
+## عملية إدارة المخاطر
+1. تحديد المخاطر.
+2. تقييم المخاطر.
+3. ترتيب الأولويات.
+4. التخطيط للتخفيف.
+5. المراقبة والمراجعة.
 
-## Deliverables
-- Risk register
-- Mitigation plans
-- Review records
+## المخرجات
+- سجل المخاطر (Risk Register).
+- خطط التخفيف.
+- سجلات المراجعة.
 
-## Success Criteria
-- Significant risks are documented.
-- Mitigation actions are tracked.
-- Risk reviews are performed periodically.
+## معايير النجاح
+- توثيق المخاطر الجوهرية.
+- متابعة إجراءات التخفيف.
+- إجراء مراجعات دورية للمخاطر.

@@ -1,23 +1,23 @@
 # Branching Strategy
 
-## Purpose
-Define the branching strategy for EduCore to support parallel development, stable releases, and efficient collaboration.
+## الهدف
+تحديد استراتيجية الفروع في EduCore لدعم التطوير المتوازي والإصدارات المستقرة والتعاون الفعّال.
 
-## Branch Types
-- `main` – Production-ready code.
-- `develop` – Primary integration branch.
-- `feature/*` – New features.
-- `bugfix/*` – Non-critical fixes.
-- `hotfix/*` – Urgent production fixes.
-- `release/*` – Release preparation.
+## أنواع الفروع
+- `main` — الكود الجاهز للإنتاج.
+- `develop` — فرع التكامل الرئيسي.
+- `feature/*` — الميزات الجديدة.
+- `bugfix/*` — الإصلاحات غير الحرجة.
+- `hotfix/*` — إصلاحات عاجلة للإنتاج.
+- `release/*` — تجهيز الإصدار.
 
-## Rules
-- Create feature branches from `develop`.
-- Merge changes through pull requests.
-- Protect `main` from direct commits.
-- Delete merged feature branches.
+## القواعد
+- إنشاء فروع الميزات من `develop`.
+- دمج التغييرات عبر Pull Requests فقط.
+- حماية `main` من الـ Commit المباشر.
+- حذف فروع الميزات بعد الدمج.
 
-## Success Criteria
-- Branch naming is consistent.
-- All merges are reviewed.
-- Release history remains clean and traceable.
+## معايير النجاح
+- اتساق تسمية الفروع.
+- مراجعة جميع عمليات الدمج.
+- بقاء سجل الإصدارات نظيفًا وقابلاً للتتبع.

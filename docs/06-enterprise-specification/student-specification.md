@@ -21,7 +21,7 @@
 
 ## Data Model
 - Student
-- Guardian
+- Parent
 - Enrollment
 - AcademicYear
 
@@ -30,7 +30,7 @@
 - GET /students/{id}
 - POST /students
 - PUT /students/{id}
-- DELETE /students/{id}
+- DELETE /students/{id} — تعطيل أو حذف منطقي (Soft Delete) فقط، طبقاً لـ BR-0804 وPP-004 No Data Loss
 
 ## UI Requirements
 - قائمة الطلاب.

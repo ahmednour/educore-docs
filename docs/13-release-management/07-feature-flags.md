@@ -1,28 +1,28 @@
 # Feature Flags
 
-## Purpose
-Define how feature flags are used in EduCore to enable controlled feature rollout, experimentation, and risk reduction.
+## الهدف
+تحديد كيفية استخدام Feature Flags في EduCore لتمكين الإطلاق التدريجي للميزات والتجريب وتقليل المخاطر.
 
-## Objectives
-- Release features independently from deployments.
-- Enable gradual rollouts.
-- Reduce deployment risk.
-- Support rapid rollback without code changes.
+## الأهداف
+- إصدار الميزات بشكل مستقل عن عمليات النشر.
+- تمكين الإطلاق التدريجي.
+- تقليل مخاطر النشر.
+- دعم التراجع السريع دون تعديل الكود.
 
-## Guidelines
-- Assign a clear owner to every feature flag.
-- Document the purpose and expected lifetime.
-- Remove obsolete flags promptly.
-- Avoid long-lived permanent flags unless justified.
+## الإرشادات
+- تحديد مسؤول واضح لكل Feature Flag.
+- توثيق الغرض والعمر الزمني المتوقع.
+- إزالة الأعلام القديمة فورًا.
+- تجنب الأعلام الدائمة طويلة الأمد إلا لسبب مبرر.
 
-## Rollout Strategy
-1. Enable internally.
-2. Roll out to a limited audience.
-3. Monitor health and feedback.
-4. Expand rollout.
-5. Remove the flag after full adoption.
+## استراتيجية الإطلاق
+1. التفعيل داخليًا.
+2. الإطلاق لعدد محدود من المستخدمين.
+3. مراقبة الأداء وردود الفعل.
+4. توسيع نطاق الإطلاق.
+5. إزالة العلم بعد الاعتماد الكامل.
 
-## Success Criteria
-- Feature flags are tracked and documented.
-- Stale flags are periodically removed.
-- Rollouts are measurable and reversible.
+## معايير النجاح
+- متابعة وتوثيق جميع الأعلام.
+- إزالة الأعلام القديمة بشكل دوري.
+- قابلية قياس وعكس عمليات الإطلاق.

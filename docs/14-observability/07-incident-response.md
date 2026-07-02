@@ -1,35 +1,35 @@
 # Incident Response
 
-## Purpose
-Define the incident response process for EduCore to detect, assess, contain, resolve, and learn from operational incidents.
+## الهدف
+تحديد عملية الاستجابة للحوادث في EduCore لاكتشاف الحوادث التشغيلية وتقييمها واحتوائها وحلها والتعلم منها.
 
-## Objectives
-- Restore services quickly.
-- Minimize business impact.
-- Ensure clear communication.
-- Capture lessons learned.
+## الأهداف
+- استعادة الخدمات بسرعة.
+- تقليل الأثر على الأعمال.
+- ضمان تواصل واضح.
+- تسجيل الدروس المستفادة.
 
-## Incident Lifecycle
-1. Detection
-2. Assessment
-3. Containment
-4. Resolution
-5. Recovery
-6. Post-Incident Review
+## دورة حياة الحادث
+1. الاكتشاف
+2. التقييم
+3. الاحتواء
+4. الحل
+5. الاستعادة
+6. المراجعة بعد الحادث
 
-## Severity Levels
-- Critical
-- High
-- Medium
-- Low
+## مستويات الخطورة
+- حرج (Critical)
+- عالٍ (High)
+- متوسط (Medium)
+- منخفض (Low)
 
-## Guidelines
-- Assign an incident owner.
-- Maintain an incident timeline.
-- Communicate status updates.
-- Document corrective actions.
+## الإرشادات
+- تعيين مالك للحادث.
+- الحفاظ على جدول زمني للحادث.
+- التواصل بتحديثات الحالة.
+- توثيق الإجراءات التصحيحية.
 
-## Success Criteria
-- Incidents are resolved within agreed targets.
-- Root causes are documented.
-- Preventive actions are tracked to completion.
+## معايير النجاح
+- حل الحوادث ضمن الأهداف المتفق عليها.
+- توثيق الأسباب الجذرية.
+- متابعة الإجراءات الوقائية حتى الإغلاق.

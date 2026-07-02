@@ -1,29 +1,29 @@
 # Distributed Tracing
 
-## Purpose
-Define the distributed tracing strategy for EduCore to follow requests across services and simplify troubleshooting in distributed systems.
+## الهدف
+تحديد استراتيجية التتبع الموزع (Distributed Tracing) في EduCore لمتابعة الطلبات عبر الخدمات وتسهيل تحليل الأعطال في الأنظمة الموزعة.
 
-## Objectives
-- Trace end-to-end requests.
-- Identify latency bottlenecks.
-- Correlate logs, metrics, and traces.
-- Accelerate root cause analysis.
+## الأهداف
+- تتبع الطلبات من البداية للنهاية (End-to-End).
+- تحديد نقاط اختناق زمن الاستجابة.
+- ربط السجلات والمقاييس والتتبعات ببعضها.
+- تسريع تحليل السبب الجذري.
 
-## Guidelines
-- Propagate trace and span identifiers.
-- Instrument critical services and APIs.
-- Trace external service calls.
-- Sample traces according to operational needs.
+## الإرشادات
+- تمرير معرّفات Trace وSpan عبر الخدمات.
+- تفعيل التتبع (Instrumentation) للخدمات وواجهات API الحرجة.
+- تتبع استدعاءات الخدمات الخارجية.
+- أخذ عينات (Sampling) من التتبعات حسب الحاجة التشغيلية.
 
-## Trace Data
+## بيانات التتبع
 - Trace ID
 - Span ID
 - Parent Span ID
-- Service Name
-- Duration
-- Status
+- اسم الخدمة
+- المدة الزمنية
+- الحالة
 
-## Success Criteria
-- Critical request paths are traceable.
-- Traces correlate with logs and metrics.
-- Performance bottlenecks are identifiable.
+## معايير النجاح
+- إمكانية تتبع مسارات الطلبات الحرجة.
+- ارتباط التتبعات بالسجلات والمقاييس.
+- إمكانية تحديد نقاط اختناق الأداء.

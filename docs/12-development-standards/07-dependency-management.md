@@ -1,25 +1,25 @@
 # Dependency Management
 
-## Purpose
-Define how external libraries, frameworks, and packages are selected, maintained, and updated in EduCore.
+## الهدف
+تحديد كيفية اختيار وصيانة وتحديث المكتبات وأطر العمل والحزم الخارجية في EduCore.
 
-## Principles
-- Prefer trusted and actively maintained dependencies.
-- Minimize unnecessary dependencies.
-- Keep dependencies up to date.
-- Track licenses and compatibility.
+## المبادئ
+- تفضيل التبعيات الموثوقة والمُصانة بشكل نشط.
+- تقليل التبعيات غير الضرورية.
+- إبقاء التبعيات محدّثة.
+- متابعة التراخيص والتوافق.
 
-## Version Management
-- Pin versions where appropriate.
-- Review major version upgrades before adoption.
-- Remove unused dependencies regularly.
+## إدارة الإصدارات
+- تثبيت الإصدارات (Pin Versions) عند الملاءمة.
+- مراجعة الترقيات الرئيسية (Major Upgrades) قبل اعتمادها.
+- إزالة التبعيات غير المستخدمة بشكل دوري.
 
-## Verification
-- Review dependency changes during code review.
-- Monitor dependency health and release notes.
-- Validate compatibility before production releases.
+## التحقق
+- مراجعة تغييرات التبعيات أثناء مراجعة الكود.
+- متابعة صحة التبعيات وملاحظات الإصدارات.
+- التحقق من التوافق قبل إصدارات الإنتاج.
 
-## Success Criteria
-- Dependencies are regularly reviewed.
-- Unsupported packages are replaced.
-- Dependency updates follow the release process.
+## معايير النجاح
+- مراجعة التبعيات بشكل دوري.
+- استبدال الحزم غير المدعومة.
+- اتباع تحديثات التبعيات لعملية الإصدار المعتمدة.

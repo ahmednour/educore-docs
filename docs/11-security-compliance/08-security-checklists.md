@@ -1,29 +1,29 @@
 # Security Checklists
 
-## Purpose
-Provide practical checklists to help teams verify that key security-related activities are completed before releases and during routine operations.
+## الهدف
+توفير قوائم تحقق عملية تساعد الفرق على التأكد من إنجاز الأنشطة الأمنية الأساسية قبل الإصدارات وأثناء التشغيل الروتيني.
 
-## Design Checklist
-- Architecture review completed.
-- Access requirements documented.
-- Sensitive data identified.
+## قائمة تحقق التصميم
+- اكتمال مراجعة المعمارية.
+- توثيق متطلبات الوصول.
+- تحديد البيانات الحساسة.
 
-## Development Checklist
-- Code reviewed.
-- Dependencies updated.
-- Logging implemented.
+## قائمة تحقق التطوير
+- مراجعة الكود.
+- تحديث التبعيات.
+- تنفيذ التسجيل (Logging).
 
-## Release Checklist
-- Verification completed.
-- Configuration reviewed.
-- Monitoring enabled.
-- Rollback plan available.
+## قائمة تحقق الإصدار
+- اكتمال التحقق.
+- مراجعة الإعدادات (Configuration).
+- تفعيل المراقبة.
+- توفر خطة التراجع (Rollback).
 
-## Operations Checklist
-- Periodic reviews completed.
-- Backups verified.
-- Documentation updated.
+## قائمة تحقق التشغيل
+- إكمال المراجعات الدورية.
+- التحقق من النسخ الاحتياطية.
+- تحديث الوثائق.
 
-## Success Criteria
-- Checklists are reviewed for every release.
-- Action items are tracked to completion.
+## معايير النجاح
+- مراجعة القوائم مع كل إصدار.
+- متابعة بنود العمل حتى الإغلاق.

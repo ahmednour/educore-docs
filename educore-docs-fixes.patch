@@ -1,0 +1,2677 @@
+diff --git a/docs/00-product-bible/naming-conventions.md b/docs/00-product-bible/naming-conventions.md
+index 244be38..a0ce16f 100644
+--- a/docs/00-product-bible/naming-conventions.md
++++ b/docs/00-product-bible/naming-conventions.md
+@@ -15,6 +15,17 @@
+ - Enrollment
+ - Payment
+ 
++## أسماء ممنوعة (Deprecated Aliases)
++لتفادي تكرار المسميات المتضاربة بين الوثائق، الأسماء التالية ممنوع استخدامها ويُستبدل بها المقابل الرسمي:
++
++| ممنوع | البديل الرسمي | السبب |
++|---|---|---|
++| Guardian | Parent | التوحيد مع 01-business وقاموس المصطلحات |
++| Class | Classroom | تفادي الالتباس مع Grade |
++| Fee (كمرجع للفاتورة) | Invoice | Fee يمثل نوع الرسم فقط، وليس المستند المالي |
++
++يجب على أي مراجعة أو Pull Request رفض أي استخدام لهذه الأسماء الممنوعة.
++
+ ## الملفات
+ - تستخدم أسماء الملفات بحروف صغيرة مع الشرطة (-).
+ - مثال: `academic-year.md`
+diff --git a/docs/02-database/entity-relationship-model.md b/docs/02-database/entity-relationship-model.md
+index 69d4222..d10f44c 100644
+--- a/docs/02-database/entity-relationship-model.md
++++ b/docs/02-database/entity-relationship-model.md
+@@ -37,5 +37,30 @@
+ - Attendance يرتبط بـ Enrollment وTimetable.
+ - Payments ترتبط بـ Invoice الخاصة بالطالب.
+ 
+-## ملاحظات
+-سيتم لاحقًا إضافة ER Diagram باستخدام Mermaid وتفاصيل جميع المفاتيح الأساسية والخارجية.
+\ No newline at end of file
++## Schema الفعلي
++تفاصيل الأعمدة، الأنواع، المفاتيح الأساسية والخارجية، والفهارس موثقة بالكامل في
++schema.md.
++
++هذا الملف يبقى كنموذج منطقي مختصر للعلاقات، بينما
++schema.md
++
++هو المرجع القابل للتنفيذ مباشرة.
++
++## ER Diagram
++```mermaid
++erDiagram
++    BRANCH ||--o{ ACADEMIC_YEAR : has
++    ACADEMIC_YEAR ||--o{ ENROLLMENT : contains
++    STUDENT ||--o{ ENROLLMENT : has
++    ENROLLMENT }o--|| CLASSROOM : "belongs to"
++    STUDENT }o--o{ PARENT : "linked via student_parents"
++    TEACHER ||--o{ TEACHER_ASSIGNMENT : has
++    TEACHER_ASSIGNMENT }o--|| SUBJECT : covers
++    TEACHER_ASSIGNMENT }o--|| CLASSROOM : "teaches in"
++    ENROLLMENT ||--o{ ATTENDANCE : generates
++    ENROLLMENT ||--o{ EXAM_RESULT : has
++    EXAM ||--o{ EXAM_RESULT : produces
++    ENROLLMENT ||--o{ FEE : owes
++    FEE ||--o{ INVOICE : "billed via"
++    INVOICE ||--o{ PAYMENT : "settled via"
++```
+\ No newline at end of file
+diff --git a/docs/02-database/schema.md b/docs/02-database/schema.md
+new file mode 100644
+index 0000000..894e79e
+--- /dev/null
++++ b/docs/02-database/schema.md
+@@ -0,0 +1,256 @@
++# Schema — التصميم الفعلي لقاعدة البيانات
++
++## الهدف
++هذا الملف يحل محل الفراغ المذكور سابقاً في
++entity-relationship-model.md
++
++ويوثق
++Schema
++
++فعلي قابل للتنفيذ مباشرة على
++PostgreSQL
++
++طبقاً للقرار
++ADR-002-database-strategy.md.
++
++## قواعد عامة على كل الجداول
++كل جدول تشغيلي في هذا المستند يحتوي إلزامياً على الأعمدة التالية
++(غير مكررة أدناه اختصاراً):
++
++| العمود | النوع | ملاحظات |
++|---|---|---|
++| id | UUID | PRIMARY KEY، افتراضي gen_random_uuid() |
++| branch_id | UUID | FK → branches.id، إلزامي طبقاً لـ MB-0101 |
++| created_at | TIMESTAMPTZ | NOT NULL DEFAULT now() |
++| updated_at | TIMESTAMPTZ | NOT NULL DEFAULT now() |
++| created_by | UUID | FK → users.id |
++| updated_by | UUID | FK → users.id، NULLABLE |
++| is_deleted | BOOLEAN | NOT NULL DEFAULT false — Soft Delete طبقاً لـ PP-004 |
++| deleted_at | TIMESTAMPTZ | NULLABLE |
++
++> جداول التهيئة العامة فقط
++(branches، roles، permissions)
++
++مستثناة من
++
++branch_id.
++
++---
++
++## branches
++| العمود | النوع | ملاحظات |
++|---|---|---|
++| name_ar | VARCHAR(200) | NOT NULL |
++| name_en | VARCHAR(200) | NOT NULL |
++| code | VARCHAR(20) | UNIQUE NOT NULL |
++| status | VARCHAR(20) | Active / Inactive |
++
++## academic_years
++| العمود | النوع | ملاحظات |
++|---|---|---|
++| name | VARCHAR(50) | مثال: 2026-2027 |
++| start_date | DATE | NOT NULL |
++| end_date | DATE | NOT NULL |
++| status | VARCHAR(20) | Draft / Active / Archived |
++
++**Index:** UNIQUE (branch_id, name)
++
++## programs
++| العمود | النوع | ملاحظات |
++|---|---|---|
++| name_ar | VARCHAR(150) | NOT NULL |
++| name_en | VARCHAR(150) | NOT NULL |
++| code | VARCHAR(20) | UNIQUE |
++
++## stages
++| العمود | النوع | ملاحظات |
++|---|---|---|
++| program_id | UUID | FK → programs.id |
++| name_ar | VARCHAR(100) | NOT NULL |
++| sort_order | SMALLINT | لترتيب العرض |
++
++## grades
++| العمود | النوع | ملاحظات |
++|---|---|---|
++| stage_id | UUID | FK → stages.id |
++| name_ar | VARCHAR(100) | NOT NULL |
++| sort_order | SMALLINT | |
++
++## classrooms
++| العمود | النوع | ملاحظات |
++|---|---|---|
++| grade_id | UUID | FK → grades.id |
++| academic_year_id | UUID | FK → academic_years.id |
++| name | VARCHAR(50) | مثال: 3A |
++| capacity | SMALLINT | NOT NULL، يُستخدم في BR-1003 |
++
++**Index:** UNIQUE (grade_id, academic_year_id, name)
++
++## subjects
++| العمود | النوع | ملاحظات |
++|---|---|---|
++| name_ar | VARCHAR(150) | NOT NULL |
++| code | VARCHAR(20) | UNIQUE |
++
++## teachers
++| العمود | النوع | ملاحظات |
++|---|---|---|
++| user_id | UUID | FK → users.id، UNIQUE |
++| employee_no | VARCHAR(30) | UNIQUE NOT NULL |
++| full_name_ar | VARCHAR(200) | NOT NULL |
++| full_name_en | VARCHAR(200) | |
++| status | VARCHAR(20) | Active / Suspended / Terminated — طبقاً لـ BR-0704 لا يوجد حذف فعلي |
++
++## teacher_assignments
++| العمود | النوع | ملاحظات |
++|---|---|---|
++| teacher_id | UUID | FK → teachers.id |
++| subject_id | UUID | FK → subjects.id |
++| classroom_id | UUID | FK → classrooms.id |
++| academic_year_id | UUID | FK → academic_years.id |
++
++**Index:** UNIQUE (teacher_id, subject_id, classroom_id, academic_year_id)
++
++## students
++| العمود | النوع | ملاحظات |
++|---|---|---|
++| reference_no | VARCHAR(30) | UNIQUE NOT NULL — BR-0801 |
++| full_name_ar | VARCHAR(200) | NOT NULL |
++| full_name_en | VARCHAR(200) | |
++| birth_date | DATE | NOT NULL |
++| gender | VARCHAR(10) | |
++| nationality | VARCHAR(100) | |
++| national_id | VARCHAR(30) | UNIQUE NULLABLE |
++| photo_url | TEXT | |
++| status | VARCHAR(20) | Active / Suspended / Withdrawn / Graduated |
++
++## parents
++| العمود | النوع | ملاحظات |
++|---|---|---|
++| user_id | UUID | FK → users.id، NULLABLE |
++| full_name_ar | VARCHAR(200) | NOT NULL |
++| phone | VARCHAR(20) | UNIQUE NOT NULL |
++| email | VARCHAR(150) | NULLABLE |
++| status | VARCHAR(20) | Active / Inactive — BR-0903، لا يوجد حذف فعلي |
++
++## student_parents (Junction Table)
++| العمود | النوع | ملاحظات |
++|---|---|---|
++| student_id | UUID | FK → students.id |
++| parent_id | UUID | FK → parents.id |
++| relationship | VARCHAR(30) | Father / Mother / Guardian-of-record |
++| is_primary | BOOLEAN | DEFAULT false |
++
++**Index:** UNIQUE (student_id, parent_id)
++
++## enrollments
++| العمود | النوع | ملاحظات |
++|---|---|---|
++| student_id | UUID | FK → students.id |
++| academic_year_id | UUID | FK → academic_years.id |
++| program_id | UUID | FK → programs.id |
++| stage_id | UUID | FK → stages.id |
++| grade_id | UUID | FK → grades.id |
++| classroom_id | UUID | FK → classrooms.id |
++| enrollment_date | DATE | NOT NULL |
++| status | VARCHAR(20) | Draft / Active / Suspended / Withdrawn / Completed |
++
++**Index:** UNIQUE (student_id, academic_year_id) WHERE status IN ('Active','Draft') — يفرض BR-1001 على مستوى قاعدة البيانات وليس منطق التطبيق فقط
++
++## attendance
++| العمود | النوع | ملاحظات |
++|---|---|---|
++| enrollment_id | UUID | FK → enrollments.id |
++| timetable_id | UUID | FK → timetables.id |
++| date | DATE | NOT NULL |
++| status | VARCHAR(15) | Present / Absent / Late / Excused |
++
++**Index:** UNIQUE (enrollment_id, timetable_id, date)
++
++## timetables
++| العمود | النوع | ملاحظات |
++|---|---|---|
++| classroom_id | UUID | FK → classrooms.id |
++| subject_id | UUID | FK → subjects.id |
++| teacher_id | UUID | FK → teachers.id |
++| day_of_week | SMALLINT | 1-7 |
++| start_time | TIME | NOT NULL |
++| end_time | TIME | NOT NULL |
++
++## exams
++| العمود | النوع | ملاحظات |
++|---|---|---|
++| subject_id | UUID | FK → subjects.id |
++| academic_year_id | UUID | FK → academic_years.id |
++| name | VARCHAR(150) | NOT NULL |
++| max_score | NUMERIC(6,2) | NOT NULL |
++| status | VARCHAR(20) | Draft / Published / ResultsApproved — يحكم BR-1404 |
++
++## exam_results
++| العمود | النوع | ملاحظات |
++|---|---|---|
++| exam_id | UUID | FK → exams.id |
++| enrollment_id | UUID | FK → enrollments.id |
++| score | NUMERIC(6,2) | NOT NULL |
++
++**Index:** UNIQUE (exam_id, enrollment_id)
++
++## fees
++| العمود | النوع | ملاحظات |
++|---|---|---|
++| enrollment_id | UUID | FK → enrollments.id — BR-1501 |
++| fee_type | VARCHAR(50) | Tuition / Transport / Books ... |
++| amount | NUMERIC(12,2) | NOT NULL |
++| due_date | DATE | NOT NULL |
++
++## invoices
++| العمود | النوع | ملاحظات |
++|---|---|---|
++| enrollment_id | UUID | FK → enrollments.id |
++| total_amount | NUMERIC(12,2) | NOT NULL |
++| status | VARCHAR(20) | Draft / Issued / PartiallyPaid / Paid / Cancelled |
++
++## payments
++| العمود | النوع | ملاحظات |
++|---|---|---|
++| invoice_id | UUID | FK → invoices.id |
++| amount | NUMERIC(12,2) | NOT NULL، مجموعها لا يتجاوز invoices.total_amount — BR-1503 |
++| method | VARCHAR(30) | Cash / Card / BankTransfer |
++| paid_at | TIMESTAMPTZ | NOT NULL |
++| reversed | BOOLEAN | DEFAULT false — يُستخدم بدل الحذف طبقاً لـ BR-1505 |
++
++## roles / permissions / role_permissions / user_roles
++تصميم RBAC قياسي:
++- roles (id, name, branch_scoped BOOLEAN)
++- permissions (id, code UNIQUE — مثال: Students.Read)
++- role_permissions (role_id, permission_id)
++- user_roles (user_id, role_id, branch_id NULLABLE)
++
++## audit_logs
++| العمود | النوع | ملاحظات |
++|---|---|---|
++| user_id | UUID | FK → users.id |
++| entity_name | VARCHAR(100) | NOT NULL |
++| entity_id | UUID | NOT NULL |
++| action | VARCHAR(20) | Create / Update / Delete / Approve |
++| old_value | JSONB | NULLABLE |
++| new_value | JSONB | NULLABLE |
++| occurred_at | TIMESTAMPTZ | NOT NULL DEFAULT now() |
++
++**Index:** (entity_name, entity_id), (occurred_at) — طبقاً لـ indexing-strategy.md
++
++---
++
++## ملاحظة على الفجوة السابقة
++كانت الوثيقة السابقة
++(entity-relationship-model.md)
++
++تنص على تأجيل بناء
++
++Schema
++
++الفعلي. هذا الملف يغلق هذه الفجوة بالكامل، ويجب اعتباره
++
++Source of Truth
++
++الرسمي لبنية قاعدة البيانات بدلاً من الوصف النظري فقط.
+diff --git a/docs/03-api/authentication.md b/docs/03-api/authentication.md
+index 18f57cf..bd1b796 100644
+--- a/docs/03-api/authentication.md
++++ b/docs/03-api/authentication.md
+@@ -1,13 +1,35 @@
+ # Authentication
+ 
+ ## الهدف
+-توحيد آلية المصادقة في EduCore لجميع تطبيقات الويب والجوال ولوحات الإدارة باستخدام JWT وRefresh Tokens.
++توحيد آلية المصادقة في EduCore لجميع تطبيقات الويب والجوال ولوحات الإدارة، طبقاً للقرار المعماري المعتمد في
++ADR-001-authentication-strategy.md.
++
++## العلاقة مع ADR-001
++هذا المستند يوثق التفاصيل التشغيلية للمصادقة، بينما
++ADR-001
++
++هو مصدر الحقيقة للقرار الاستراتيجي. الأساس المعتمد هو
++OAuth 2.1
++
++و
++
++OpenID Connect،
++
++ويُستخدم
++JWT
++
++كصيغة داخلية لـ
++
++Access Token
++
++ضمن هذا الإطار، وليس كبديل عنه.
+ 
+ ## المبادئ
+ - استخدام HTTPS فقط.
+-- Access Token قصير العمر.
++- Access Token قصير العمر، بصيغة JWT.
+ - Refresh Token طويل العمر وقابل للإبطال.
+ - دعم تسجيل الخروج من جميع الأجهزة.
++- دعم Multi-Factor Authentication (MFA) طبقاً لـ ADR-001.
+ 
+ ## طرق تسجيل الدخول
+ - اسم المستخدم أو البريد الإلكتروني.
+diff --git a/docs/06-enterprise-specification/attendance-specification.md b/docs/06-enterprise-specification/attendance-specification.md
+index 4f28924..c36d571 100644
+--- a/docs/06-enterprise-specification/attendance-specification.md
++++ b/docs/06-enterprise-specification/attendance-specification.md
+@@ -32,7 +32,7 @@
+ - GET /attendance/{id}
+ - POST /attendance
+ - PUT /attendance/{id}
+-- DELETE /attendance/{id}
++- DELETE /attendance/{id} — حذف منطقي (Soft Delete) فقط، ممنوع الحذف الفعلي لسجل حضور معتمد
+ 
+ ## UI Requirements
+ - شاشة تسجيل الحضور.
+diff --git a/docs/06-enterprise-specification/enrollment-specification.md b/docs/06-enterprise-specification/enrollment-specification.md
+index d602e16..d91d57b 100644
+--- a/docs/06-enterprise-specification/enrollment-specification.md
++++ b/docs/06-enterprise-specification/enrollment-specification.md
+@@ -32,7 +32,7 @@
+ - GET /enrollments/{id}
+ - POST /enrollments
+ - PUT /enrollments/{id}
+-- DELETE /enrollments/{id}
++- DELETE /enrollments/{id} — لا يحذف السجل، يحوّل الحالة إلى Withdrawn طبقاً لـ BR-1004
+ 
+ ## UI Requirements
+ - قائمة التسجيلات.
+diff --git a/docs/06-enterprise-specification/exam-specification.md b/docs/06-enterprise-specification/exam-specification.md
+index 57011d3..07d053e 100644
+--- a/docs/06-enterprise-specification/exam-specification.md
++++ b/docs/06-enterprise-specification/exam-specification.md
+@@ -25,7 +25,7 @@
+ - GET /exams
+ - POST /exams
+ - PUT /exams/{id}
+-- DELETE /exams/{id}
++- DELETE /exams/{id} — مسموح فقط قبل اعتماد النتائج (BR-1404)، وبعدها يُستخدم الإلغاء
+ 
+ ## Acceptance Criteria
+ - إنشاء اختبار بنجاح.
+diff --git a/docs/06-enterprise-specification/parent-specification.md b/docs/06-enterprise-specification/parent-specification.md
+index cb0d130..13bc1cf 100644
+--- a/docs/06-enterprise-specification/parent-specification.md
++++ b/docs/06-enterprise-specification/parent-specification.md
+@@ -30,7 +30,7 @@
+ - GET /parents/{id}
+ - POST /parents
+ - PUT /parents/{id}
+-- DELETE /parents/{id}
++- DELETE /parents/{id} — تعطيل (Deactivate) وليس حذف فعلي طالما مرتبط بطلاب (BR-0903)
+ 
+ ## UI Requirements
+ - قائمة أولياء الأمور.
+diff --git a/docs/06-enterprise-specification/student-specification.md b/docs/06-enterprise-specification/student-specification.md
+index d576613..5ca2381 100644
+--- a/docs/06-enterprise-specification/student-specification.md
++++ b/docs/06-enterprise-specification/student-specification.md
+@@ -21,7 +21,7 @@
+ 
+ ## Data Model
+ - Student
+-- Guardian
++- Parent
+ - Enrollment
+ - AcademicYear
+ 
+@@ -30,7 +30,7 @@
+ - GET /students/{id}
+ - POST /students
+ - PUT /students/{id}
+-- DELETE /students/{id}
++- DELETE /students/{id} — تعطيل أو حذف منطقي (Soft Delete) فقط، طبقاً لـ BR-0804 وPP-004 No Data Loss
+ 
+ ## UI Requirements
+ - قائمة الطلاب.
+diff --git a/docs/06-enterprise-specification/teacher-specification.md b/docs/06-enterprise-specification/teacher-specification.md
+index 2062353..d50df53 100644
+--- a/docs/06-enterprise-specification/teacher-specification.md
++++ b/docs/06-enterprise-specification/teacher-specification.md
+@@ -30,7 +30,7 @@
+ - GET /teachers/{id}
+ - POST /teachers
+ - PUT /teachers/{id}
+-- DELETE /teachers/{id}
++- DELETE /teachers/{id} — تعطيل (Deactivate) وليس حذف فعلي إذا وُجدت بيانات تشغيلية (BR-0704)
+ 
+ ## UI Requirements
+ - قائمة المعلمين.
+diff --git a/docs/06-enterprise-specification/timetable-specification.md b/docs/06-enterprise-specification/timetable-specification.md
+index 4b74124..e0a1dac 100644
+--- a/docs/06-enterprise-specification/timetable-specification.md
++++ b/docs/06-enterprise-specification/timetable-specification.md
+@@ -31,7 +31,7 @@
+ - GET /timetables/{id}
+ - POST /timetables
+ - PUT /timetables/{id}
+-- DELETE /timetables/{id}
++- DELETE /timetables/{id} — حذف مسموح فقط قبل بدء تفعيل الجدول، وبعدها يُستخدم الأرشفة
+ 
+ ## UI Requirements
+ - عرض أسبوعي للجدول.
+diff --git a/docs/09-architecture-decisions/ADR-007-security-model.md b/docs/09-architecture-decisions/ADR-007-security-model.md
+index e06c400..50458a0 100644
+--- a/docs/09-architecture-decisions/ADR-007-security-model.md
++++ b/docs/09-architecture-decisions/ADR-007-security-model.md
+@@ -4,33 +4,33 @@
+ Accepted
+ 
+ ## Context
+-EduCore requires a consistent security architecture to protect sensitive data, enforce authorization, and support compliance requirements.
++يحتاج EduCore إلى معمارية أمنية متسقة لحماية البيانات الحساسة، وفرض التفويض، ودعم متطلبات الامتثال.
+ 
+ ## Decision
+-- Adopt a Zero Trust approach.
+-- Use Role-Based Access Control (RBAC), with future extensibility toward ABAC.
+-- Encrypt data in transit using TLS and encrypt sensitive data at rest.
+-- Require multi-factor authentication for privileged accounts.
+-- Record security-sensitive actions in the audit log.
+-- Perform periodic security reviews and vulnerability assessments.
++- اعتماد نهج Zero Trust.
++- استخدام Role-Based Access Control (RBAC)، مع إمكانية التوسع مستقبلاً نحو ABAC.
++- تشفير البيانات أثناء النقل باستخدام TLS، وتشفير البيانات الحساسة أثناء التخزين.
++- إلزام المصادقة متعددة العوامل (MFA) للحسابات ذات الصلاحيات الحساسة.
++- تسجيل الإجراءات الحساسة أمنيًا في سجل التدقيق (Audit Log).
++- إجراء مراجعات أمنية دورية وتقييمات للثغرات.
+ 
+ ## Alternatives Considered
+-- Perimeter-only security.
+-- RBAC without MFA.
+-- Partial encryption.
++- الأمان القائم على المحيط فقط (Perimeter-only Security).
++- RBAC بدون MFA.
++- تشفير جزئي.
+ 
+ ## Consequences
+-### Pros
+-- Stronger protection against unauthorized access.
+-- Improved compliance and auditability.
+-- Better visibility into security events.
++### الإيجابيات
++- حماية أقوى ضد الوصول غير المصرح به.
++- تحسين الامتثال وقابلية التدقيق.
++- رؤية أفضل للأحداث الأمنية.
+ 
+-### Cons
+-- Increased operational complexity.
+-- Additional key and identity management requirements.
++### السلبيات
++- زيادة التعقيد التشغيلي.
++- متطلبات إضافية لإدارة المفاتيح والهويات.
+ 
+ ## References
+ - NIST Zero Trust Architecture
+ - OWASP ASVS
+ - NIST Cybersecurity Framework
+-- CIS Controls
+\ No newline at end of file
++- CIS Controls
+diff --git a/docs/09-architecture-decisions/ADR-008-scalability-strategy.md b/docs/09-architecture-decisions/ADR-008-scalability-strategy.md
+index 327ac26..e8b0030 100644
+--- a/docs/09-architecture-decisions/ADR-008-scalability-strategy.md
++++ b/docs/09-architecture-decisions/ADR-008-scalability-strategy.md
+@@ -4,32 +4,32 @@
+ Accepted
+ 
+ ## Context
+-EduCore is expected to support increasing numbers of users, schools, and transactions while maintaining consistent performance and availability.
++من المتوقع أن يدعم EduCore أعدادًا متزايدة من المستخدمين والمدارس والمعاملات مع الحفاظ على أداء وتوفر ثابتين.
+ 
+ ## Decision
+-- Design services to scale horizontally where practical.
+-- Introduce caching for frequently accessed data.
+-- Support asynchronous processing for long-running tasks.
+-- Use load balancing across application instances.
+-- Optimize database access with indexing and read replicas when needed.
++- تصميم الخدمات لتدعم التوسع الأفقي (Horizontal Scaling) حيثما أمكن.
++- إدخال طبقة تخزين مؤقت (Caching) للبيانات كثيرة الوصول.
++- دعم المعالجة غير المتزامنة (Asynchronous Processing) للمهام طويلة التنفيذ.
++- استخدام موازنة الحمل (Load Balancing) عبر نسخ التطبيق.
++- تحسين الوصول لقاعدة البيانات عبر الفهرسة وRead Replicas عند الحاجة.
+ 
+ ## Alternatives Considered
+-- Vertical scaling only.
+-- Monolithic scaling without workload separation.
+-- No caching layer.
++- التوسع الرأسي (Vertical Scaling) فقط.
++- التوسع كوحدة Monolithic واحدة دون فصل الأحمال.
++- عدم استخدام طبقة تخزين مؤقت.
+ 
+ ## Consequences
+-### Pros
+-- Better resilience under increased load.
+-- Improved response times.
+-- Flexible capacity planning.
++### الإيجابيات
++- مرونة أفضل تحت الحمل المتزايد.
++- تحسين أزمنة الاستجابة.
++- تخطيط سعة مرن.
+ 
+-### Cons
+-- Increased operational complexity.
+-- Additional infrastructure and monitoring requirements.
++### السلبيات
++- زيادة التعقيد التشغيلي.
++- متطلبات إضافية للبنية التحتية والمراقبة.
+ 
+ ## References
+ - The Twelve-Factor App
+ - Google SRE Workbook
+ - Microsoft Well-Architected Framework
+-- AWS Well-Architected Framework
+\ No newline at end of file
++- AWS Well-Architected Framework
+diff --git a/docs/10-testing-quality/05-performance-testing.md b/docs/10-testing-quality/05-performance-testing.md
+index ba10ad2..b4cb056 100644
+--- a/docs/10-testing-quality/05-performance-testing.md
++++ b/docs/10-testing-quality/05-performance-testing.md
+@@ -1,29 +1,29 @@
+ # Performance Testing
+ 
+-## Purpose
+-Define the approach for validating EduCore performance under expected and peak workloads.
++## الهدف
++تحديد منهجية التحقق من أداء EduCore تحت أحمال التشغيل المتوقعة وأحمال الذروة.
+ 
+-## Scope
+-- Load testing
+-- Stress testing
+-- Spike testing
+-- Endurance testing
+-- Scalability testing
++## النطاق
++- Load Testing
++- Stress Testing
++- Spike Testing
++- Endurance Testing
++- Scalability Testing
+ 
+-## Key Metrics
+-- Response time
+-- Throughput
+-- Error rate
+-- CPU and memory utilization
+-- Concurrent user capacity
++## المؤشرات الرئيسية
++- زمن الاستجابة (Response Time).
++- الإنتاجية (Throughput).
++- معدل الأخطاء (Error Rate).
++- استهلاك المعالج والذاكرة (CPU / Memory Utilization).
++- سعة المستخدمين المتزامنين (Concurrent User Capacity).
+ 
+-## Principles
+-- Use production-like environments.
+-- Simulate realistic user behavior.
+-- Monitor infrastructure during execution.
+-- Analyze bottlenecks and document findings.
++## المبادئ
++- استخدام بيئات مطابقة للإنتاج قدر الإمكان.
++- محاكاة سلوك مستخدم واقعي.
++- مراقبة البنية التحتية أثناء التنفيذ.
++- تحليل نقاط الاختناق وتوثيق النتائج.
+ 
+-## Success Criteria
+-- Performance targets are achieved.
+-- No critical bottlenecks remain.
+-- System remains stable under target load.
+\ No newline at end of file
++## معايير النجاح
++- تحقيق أهداف الأداء المحددة.
++- عدم وجود نقاط اختناق حرجة متبقية.
++- استقرار النظام تحت الحمل المستهدف.
+diff --git a/docs/10-testing-quality/06-security-testing.md b/docs/10-testing-quality/06-security-testing.md
+index 16009ca..87363a9 100644
+--- a/docs/10-testing-quality/06-security-testing.md
++++ b/docs/10-testing-quality/06-security-testing.md
+@@ -1,23 +1,23 @@
+ # Application Verification
+ 
+-## Purpose
+-Define verification activities that help ensure EduCore is ready for production from a quality perspective.
++## الهدف
++تحديد أنشطة التحقق التي تضمن جاهزية EduCore للإنتاج من ناحية الجودة.
+ 
+-## Scope
+-- Login and access validation
+-- Input handling verification
+-- Session lifecycle checks
+-- API behavior validation
+-- Dependency health review
+-- Release readiness review
++## النطاق
++- التحقق من تسجيل الدخول والوصول.
++- التحقق من معالجة المدخلات.
++- فحص دورة حياة الجلسة (Session Lifecycle).
++- التحقق من سلوك واجهات API.
++- مراجعة صحة التبعيات (Dependencies).
++- مراجعة الجاهزية للإصدار.
+ 
+-## Activities
+-- Automated code analysis
+-- Runtime behavior verification
+-- Dependency review
+-- Manual checklist execution
++## الأنشطة
++- التحليل الآلي للكود (Automated Code Analysis).
++- التحقق من سلوك النظام أثناء التشغيل.
++- مراجعة التبعيات.
++- تنفيذ قوائم تحقق يدوية.
+ 
+-## Success Criteria
+-- High-priority findings are resolved before release.
+-- Verification results are documented.
+-- Verification is included in the release pipeline.
+\ No newline at end of file
++## معايير النجاح
++- معالجة الملاحظات عالية الأولوية قبل الإصدار.
++- توثيق نتائج التحقق.
++- إدراج التحقق ضمن خط الإصدار (Release Pipeline).
+diff --git a/docs/10-testing-quality/07-test-automation.md b/docs/10-testing-quality/07-test-automation.md
+index 06c4d63..a891852 100644
+--- a/docs/10-testing-quality/07-test-automation.md
++++ b/docs/10-testing-quality/07-test-automation.md
+@@ -1,28 +1,28 @@
+ # Test Automation
+ 
+-## Purpose
+-Define the automated testing approach for EduCore to improve reliability, repeatability, and release confidence.
++## الهدف
++تحديد منهجية أتمتة الاختبارات في EduCore لتحسين الموثوقية وقابلية التكرار والثقة في الإصدارات.
+ 
+-## Scope
+-- Automated unit tests
+-- Automated integration tests
+-- End-to-end automation
+-- Regression test suites
+-- CI/CD execution
++## النطاق
++- اختبارات الوحدة الآلية (Automated Unit Tests).
++- اختبارات التكامل الآلية.
++- أتمتة اختبارات End-to-End.
++- مجموعات اختبارات الانحدار (Regression Suites).
++- التنفيذ ضمن CI/CD.
+ 
+-## Principles
+-- Run tests automatically on every change.
+-- Keep automated tests deterministic.
+-- Maintain fast feedback for developers.
+-- Review and update tests alongside application changes.
++## المبادئ
++- تشغيل الاختبارات آليًا مع كل تغيير.
++- الحفاظ على نتائج ثابتة وغير عشوائية (Deterministic).
++- الحفاظ على سرعة التغذية الراجعة للمطورين.
++- مراجعة وتحديث الاختبارات مع كل تغيير في التطبيق.
+ 
+-## Tooling
+-- CI pipeline integration
+-- Test reporting
+-- Code coverage reporting
+-- Artifact retention
++## الأدوات
++- التكامل مع خط CI.
++- تقارير الاختبارات.
++- تقارير تغطية الكود (Code Coverage).
++- الاحتفاظ بمخرجات التنفيذ (Artifacts).
+ 
+-## Success Criteria
+-- Automated tests execute successfully in CI.
+-- Regression defects are detected early.
+-- Test execution results are visible to the team.
+\ No newline at end of file
++## معايير النجاح
++- نجاح تنفيذ الاختبارات الآلية ضمن CI.
++- اكتشاف عيوب الانحدار مبكرًا.
++- وضوح نتائج التنفيذ لكل الفريق.
+diff --git a/docs/10-testing-quality/08-quality-metrics.md b/docs/10-testing-quality/08-quality-metrics.md
+index e799367..7ca3b22 100644
+--- a/docs/10-testing-quality/08-quality-metrics.md
++++ b/docs/10-testing-quality/08-quality-metrics.md
+@@ -1,29 +1,29 @@
+ # Quality Metrics
+ 
+-## Purpose
+-Define the key quality indicators used to measure the health and effectiveness of the EduCore development process and product quality.
++## الهدف
++تحديد مؤشرات الجودة الرئيسية المستخدمة لقياس صحة عملية التطوير وجودة منتج EduCore.
+ 
+-## Metrics
+-- Test coverage
+-- Defect density
+-- Escaped defects
+-- Build success rate
+-- Mean time to resolution (MTTR)
+-- Test execution success rate
+-- Release frequency
++## المؤشرات
++- تغطية الاختبارات (Test Coverage).
++- كثافة العيوب (Defect Density).
++- العيوب المتسربة للإنتاج (Escaped Defects).
++- معدل نجاح البناء (Build Success Rate).
++- متوسط زمن الحل (MTTR).
++- معدل نجاح تنفيذ الاختبارات.
++- تكرار الإصدارات (Release Frequency).
+ 
+-## Measurement Principles
+-- Track trends over time.
+-- Use consistent definitions.
+-- Review metrics regularly.
+-- Focus on continuous improvement.
++## مبادئ القياس
++- تتبع الاتجاهات عبر الزمن.
++- استخدام تعريفات موحدة وثابتة.
++- مراجعة المؤشرات بشكل دوري.
++- التركيز على التحسين المستمر.
+ 
+-## Reporting
+-- CI/CD dashboards
+-- Sprint quality reports
+-- Release readiness reports
++## التقارير
++- لوحات معلومات CI/CD.
++- تقارير جودة السبرنت.
++- تقارير جاهزية الإصدار.
+ 
+-## Success Criteria
+-- Metrics are collected automatically where possible.
+-- Quality goals are reviewed periodically.
+-- Continuous improvement actions are documented.
+\ No newline at end of file
++## معايير النجاح
++- جمع المؤشرات آليًا قدر الإمكان.
++- مراجعة أهداف الجودة دوريًا.
++- توثيق إجراءات التحسين المستمر.
+diff --git a/docs/11-security-compliance/01-security-architecture.md b/docs/11-security-compliance/01-security-architecture.md
+index d6ef037..4893a88 100644
+--- a/docs/11-security-compliance/01-security-architecture.md
++++ b/docs/11-security-compliance/01-security-architecture.md
+@@ -1,31 +1,31 @@
+ # Security Architecture
+ 
+-## Purpose
+-Document the high-level security architecture for EduCore and define the primary security controls applied across the platform.
++## الهدف
++توثيق المعمارية الأمنية العامة لنظام EduCore وتحديد الضوابط الأمنية الأساسية المطبقة عبر المنصة.
+ 
+-## Objectives
+-- Protect sensitive data.
+-- Enforce strong authentication and authorization.
+-- Reduce attack surface.
+-- Support compliance requirements.
+-- Enable continuous monitoring.
++## الأهداف
++- حماية البيانات الحساسة.
++- فرض مصادقة وتفويض قويين.
++- تقليل سطح الهجوم.
++- دعم متطلبات الامتثال.
++- تمكين المراقبة المستمرة.
+ 
+-## Security Layers
+-- Identity and Access Management
+-- Network Security
+-- Application Security
+-- Data Protection
+-- Logging and Monitoring
+-- Infrastructure Security
++## الطبقات الأمنية
++- إدارة الهوية والوصول (IAM).
++- أمان الشبكة.
++- أمان التطبيق.
++- حماية البيانات.
++- التسجيل والمراقبة.
++- أمان البنية التحتية.
+ 
+-## Core Principles
+-- Least privilege
+-- Defense in depth
+-- Secure by default
+-- Zero Trust
+-- Auditability
++## المبادئ الأساسية
++- مبدأ أقل الصلاحيات (Least Privilege).
++- الدفاع متعدد الطبقات (Defense in Depth).
++- الأمان الافتراضي (Secure by Default).
++- Zero Trust.
++- قابلية التدقيق (Auditability).
+ 
+-## Success Criteria
+-- Security controls are consistently applied.
+-- High-risk assets receive additional protection.
+-- Security architecture is reviewed regularly.
+\ No newline at end of file
++## معايير النجاح
++- تطبيق الضوابط الأمنية باستمرار.
++- حصول الأصول عالية الخطورة على حماية إضافية.
++- مراجعة المعمارية الأمنية بشكل دوري.
+diff --git a/docs/11-security-compliance/02-compliance-requirements.md b/docs/11-security-compliance/02-compliance-requirements.md
+index f983038..ad00f1f 100644
+--- a/docs/11-security-compliance/02-compliance-requirements.md
++++ b/docs/11-security-compliance/02-compliance-requirements.md
+@@ -1,29 +1,29 @@
+ # Compliance Requirements
+ 
+-## Purpose
+-Document the compliance requirements applicable to EduCore and define the controls needed to support regulatory and organizational obligations.
++## الهدف
++توثيق متطلبات الامتثال المطبقة على EduCore وتحديد الضوابط اللازمة لدعم الالتزامات التنظيمية والمؤسسية.
+ 
+-## Objectives
+-- Identify applicable compliance frameworks.
+-- Define required administrative and technical controls.
+-- Support audit readiness.
+-- Maintain compliance evidence.
++## الأهداف
++- تحديد أطر الامتثال المطبقة.
++- تحديد الضوابط الإدارية والتقنية المطلوبة.
++- دعم الجاهزية للتدقيق.
++- الحفاظ على أدلة الامتثال.
+ 
+-## Scope
+-- Data governance
+-- Access management
+-- Audit logging
+-- Record retention
+-- Change management
+-- Third-party services
++## النطاق
++- حوكمة البيانات.
++- إدارة الوصول.
++- سجلات التدقيق (Audit Logging).
++- الاحتفاظ بالسجلات.
++- إدارة التغيير.
++- الخدمات الخارجية (Third-Party Services).
+ 
+-## Compliance Activities
+-- Periodic compliance reviews
+-- Internal assessments
+-- Documentation updates
+-- Corrective action tracking
++## أنشطة الامتثال
++- مراجعات دورية للامتثال.
++- تقييمات داخلية.
++- تحديث الوثائق.
++- متابعة الإجراءات التصحيحية.
+ 
+-## Success Criteria
+-- Compliance requirements are documented.
+-- Required controls are implemented.
+-- Audit evidence is maintained and reviewed regularly.
+\ No newline at end of file
++## معايير النجاح
++- توثيق متطلبات الامتثال.
++- تطبيق الضوابط المطلوبة.
++- الحفاظ على أدلة التدقيق ومراجعتها دوريًا.
+diff --git a/docs/11-security-compliance/03-data-classification.md b/docs/11-security-compliance/03-data-classification.md
+index 3f6854c..0555a12 100644
+--- a/docs/11-security-compliance/03-data-classification.md
++++ b/docs/11-security-compliance/03-data-classification.md
+@@ -1,27 +1,27 @@
+ # Data Classification
+ 
+-## Purpose
+-Define the data classification model used by EduCore to ensure information is handled according to its sensitivity and business value.
++## الهدف
++تحديد نموذج تصنيف البيانات المستخدم في EduCore لضمان التعامل مع المعلومات وفق حساسيتها وقيمتها للأعمال.
+ 
+-## Classification Levels
+-- Public
+-- Internal
+-- Confidential
+-- Restricted
++## مستويات التصنيف
++- عام (Public)
++- داخلي (Internal)
++- سري (Confidential)
++- مقيد (Restricted)
+ 
+-## Handling Requirements
+-- Define storage requirements for each classification.
+-- Define transmission requirements.
+-- Apply appropriate access controls.
+-- Define retention and disposal rules.
++## متطلبات التعامل
++- تحديد متطلبات التخزين لكل مستوى تصنيف.
++- تحديد متطلبات النقل والإرسال.
++- تطبيق ضوابط وصول مناسبة.
++- تحديد قواعد الاحتفاظ والإتلاف.
+ 
+-## Responsibilities
+-- Data Owners
+-- System Administrators
+-- Application Teams
+-- Compliance Team
++## المسؤوليات
++- مالكو البيانات (Data Owners).
++- مسؤولو النظام.
++- فرق التطبيقات.
++- فريق الامتثال.
+ 
+-## Success Criteria
+-- All critical data is classified.
+-- Handling requirements are documented.
+-- Access controls align with data classification.
+\ No newline at end of file
++## معايير النجاح
++- تصنيف جميع البيانات الحرجة.
++- توثيق متطلبات التعامل مع كل مستوى.
++- توافق ضوابط الوصول مع تصنيف البيانات.
+diff --git a/docs/11-security-compliance/04-privacy-data-protection.md b/docs/11-security-compliance/04-privacy-data-protection.md
+index a2a608d..cf56347 100644
+--- a/docs/11-security-compliance/04-privacy-data-protection.md
++++ b/docs/11-security-compliance/04-privacy-data-protection.md
+@@ -1,29 +1,29 @@
+ # Privacy & Data Protection
+ 
+-## Purpose
+-Document the privacy principles and data protection practices adopted by EduCore throughout the information lifecycle.
++## الهدف
++توثيق مبادئ الخصوصية وممارسات حماية البيانات المعتمدة في EduCore عبر دورة حياة المعلومات.
+ 
+-## Objectives
+-- Protect personal information.
+-- Minimize unnecessary data collection.
+-- Define retention and disposal rules.
+-- Support applicable privacy obligations.
++## الأهداف
++- حماية المعلومات الشخصية.
++- تقليل جمع البيانات غير الضروري.
++- تحديد قواعد الاحتفاظ والإتلاف.
++- دعم متطلبات الخصوصية المطبقة.
+ 
+-## Scope
+-- Data collection
+-- Data storage
+-- Data sharing
+-- Data retention
+-- Data disposal
++## النطاق
++- جمع البيانات.
++- تخزين البيانات.
++- مشاركة البيانات.
++- الاحتفاظ بالبيانات.
++- إتلاف البيانات.
+ 
+-## Principles
+-- Data minimization
+-- Purpose limitation
+-- Accuracy
+-- Confidentiality
+-- Accountability
++## المبادئ
++- تقليل البيانات (Data Minimization).
++- تحديد الغرض (Purpose Limitation).
++- الدقة.
++- السرية.
++- المساءلة (Accountability).
+ 
+-## Success Criteria
+-- Personal data handling is documented.
+-- Retention rules are defined.
+-- Privacy requirements are reviewed periodically.
+\ No newline at end of file
++## معايير النجاح
++- توثيق كيفية التعامل مع البيانات الشخصية.
++- تحديد قواعد الاحتفاظ.
++- مراجعة متطلبات الخصوصية بشكل دوري.
+diff --git a/docs/11-security-compliance/05-threat-modeling.md b/docs/11-security-compliance/05-threat-modeling.md
+index 1c6d946..9272002 100644
+--- a/docs/11-security-compliance/05-threat-modeling.md
++++ b/docs/11-security-compliance/05-threat-modeling.md
+@@ -1,29 +1,29 @@
+ # Threat Modeling
+ 
+-## Purpose
+-Document the approach used to identify, evaluate, and prioritize potential threats throughout the EduCore architecture and development lifecycle.
++## الهدف
++توثيق المنهجية المستخدمة لتحديد وتقييم وترتيب أولويات التهديدات المحتملة عبر معمارية EduCore ودورة التطوير.
+ 
+-## Objectives
+-- Identify critical assets.
+-- Analyze trust boundaries.
+-- Evaluate potential threats.
+-- Prioritize mitigation activities.
++## الأهداف
++- تحديد الأصول الحرجة.
++- تحليل حدود الثقة (Trust Boundaries).
++- تقييم التهديدات المحتملة.
++- ترتيب أولويات إجراءات التخفيف.
+ 
+-## Process
+-1. Define system scope.
+-2. Identify assets and data flows.
+-3. Identify trust boundaries.
+-4. Analyze potential threats.
+-5. Document mitigations.
+-6. Review periodically.
++## المنهجية
++1. تحديد نطاق النظام.
++2. تحديد الأصول وتدفقات البيانات.
++3. تحديد حدود الثقة.
++4. تحليل التهديدات المحتملة.
++5. توثيق إجراءات التخفيف.
++6. المراجعة الدورية.
+ 
+-## Deliverables
+-- Data flow diagrams
+-- Threat register
+-- Mitigation plan
+-- Review records
++## المخرجات
++- مخططات تدفق البيانات.
++- سجل التهديدات (Threat Register).
++- خطة التخفيف.
++- سجلات المراجعة.
+ 
+-## Success Criteria
+-- High-risk threats are documented.
+-- Mitigation actions are tracked.
+-- Threat models are updated with major architectural changes.
+\ No newline at end of file
++## معايير النجاح
++- توثيق التهديدات عالية الخطورة.
++- متابعة إجراءات التخفيف.
++- تحديث نموذج التهديدات مع أي تغيير معماري كبير.
+diff --git a/docs/11-security-compliance/06-secure-development-lifecycle.md b/docs/11-security-compliance/06-secure-development-lifecycle.md
+index b1e720a..bc7531d 100644
+--- a/docs/11-security-compliance/06-secure-development-lifecycle.md
++++ b/docs/11-security-compliance/06-secure-development-lifecycle.md
+@@ -1,30 +1,30 @@
+ # Secure Development Lifecycle
+ 
+-## Purpose
+-Document how security-related activities are integrated throughout the EduCore software development lifecycle.
++## الهدف
++توثيق كيفية دمج الأنشطة الأمنية عبر دورة حياة تطوير برمجيات EduCore.
+ 
+-## Objectives
+-- Include verification activities in every development phase.
+-- Reduce defects early.
+-- Improve release readiness.
+-- Support continuous improvement.
++## الأهداف
++- تضمين أنشطة التحقق في كل مرحلة تطوير.
++- تقليل العيوب مبكرًا.
++- تحسين الجاهزية للإصدار.
++- دعم التحسين المستمر.
+ 
+-## Lifecycle Stages
+-1. Requirements
+-2. Design
+-3. Implementation
+-4. Code Review
+-5. Verification
+-6. Release
+-7. Maintenance
++## مراحل دورة الحياة
++1. المتطلبات
++2. التصميم
++3. التنفيذ
++4. مراجعة الكود
++5. التحقق
++6. الإصدار
++7. الصيانة
+ 
+-## Practices
+-- Peer code reviews
+-- Dependency updates
+-- Automated quality checks
+-- Release verification
++## الممارسات
++- مراجعات الكود بين الأقران.
++- تحديث التبعيات.
++- فحوصات الجودة الآلية.
++- التحقق قبل الإصدار.
+ 
+-## Success Criteria
+-- Development standards are followed.
+-- Verification activities are completed before release.
+-- Improvements are captured after each release.
+\ No newline at end of file
++## معايير النجاح
++- الالتزام بمعايير التطوير.
++- إكمال أنشطة التحقق قبل الإصدار.
++- توثيق التحسينات بعد كل إصدار.
+diff --git a/docs/11-security-compliance/07-risk-management.md b/docs/11-security-compliance/07-risk-management.md
+index 8ce36f2..cefaf86 100644
+--- a/docs/11-security-compliance/07-risk-management.md
++++ b/docs/11-security-compliance/07-risk-management.md
+@@ -1,27 +1,27 @@
+ # Risk Management
+ 
+-## Purpose
+-Document the process for identifying, evaluating, treating, and monitoring risks throughout the EduCore project lifecycle.
++## الهدف
++توثيق عملية تحديد وتقييم ومعالجة ومتابعة المخاطر عبر دورة حياة مشروع EduCore.
+ 
+-## Objectives
+-- Identify project and operational risks.
+-- Assess likelihood and impact.
+-- Define mitigation and contingency actions.
+-- Review risks regularly.
++## الأهداف
++- تحديد المخاطر المشروعية والتشغيلية.
++- تقييم الاحتمالية والأثر.
++- تحديد إجراءات التخفيف والطوارئ.
++- المراجعة الدورية للمخاطر.
+ 
+-## Risk Process
+-1. Risk identification
+-2. Risk assessment
+-3. Risk prioritization
+-4. Mitigation planning
+-5. Monitoring and review
++## عملية إدارة المخاطر
++1. تحديد المخاطر.
++2. تقييم المخاطر.
++3. ترتيب الأولويات.
++4. التخطيط للتخفيف.
++5. المراقبة والمراجعة.
+ 
+-## Deliverables
+-- Risk register
+-- Mitigation plans
+-- Review records
++## المخرجات
++- سجل المخاطر (Risk Register).
++- خطط التخفيف.
++- سجلات المراجعة.
+ 
+-## Success Criteria
+-- Significant risks are documented.
+-- Mitigation actions are tracked.
+-- Risk reviews are performed periodically.
+\ No newline at end of file
++## معايير النجاح
++- توثيق المخاطر الجوهرية.
++- متابعة إجراءات التخفيف.
++- إجراء مراجعات دورية للمخاطر.
+diff --git a/docs/11-security-compliance/08-security-checklists.md b/docs/11-security-compliance/08-security-checklists.md
+index 94f45d0..78dfd6d 100644
+--- a/docs/11-security-compliance/08-security-checklists.md
++++ b/docs/11-security-compliance/08-security-checklists.md
+@@ -1,29 +1,29 @@
+ # Security Checklists
+ 
+-## Purpose
+-Provide practical checklists to help teams verify that key security-related activities are completed before releases and during routine operations.
++## الهدف
++توفير قوائم تحقق عملية تساعد الفرق على التأكد من إنجاز الأنشطة الأمنية الأساسية قبل الإصدارات وأثناء التشغيل الروتيني.
+ 
+-## Design Checklist
+-- Architecture review completed.
+-- Access requirements documented.
+-- Sensitive data identified.
++## قائمة تحقق التصميم
++- اكتمال مراجعة المعمارية.
++- توثيق متطلبات الوصول.
++- تحديد البيانات الحساسة.
+ 
+-## Development Checklist
+-- Code reviewed.
+-- Dependencies updated.
+-- Logging implemented.
++## قائمة تحقق التطوير
++- مراجعة الكود.
++- تحديث التبعيات.
++- تنفيذ التسجيل (Logging).
+ 
+-## Release Checklist
+-- Verification completed.
+-- Configuration reviewed.
+-- Monitoring enabled.
+-- Rollback plan available.
++## قائمة تحقق الإصدار
++- اكتمال التحقق.
++- مراجعة الإعدادات (Configuration).
++- تفعيل المراقبة.
++- توفر خطة التراجع (Rollback).
+ 
+-## Operations Checklist
+-- Periodic reviews completed.
+-- Backups verified.
+-- Documentation updated.
++## قائمة تحقق التشغيل
++- إكمال المراجعات الدورية.
++- التحقق من النسخ الاحتياطية.
++- تحديث الوثائق.
+ 
+-## Success Criteria
+-- Checklists are reviewed for every release.
+-- Action items are tracked to completion.
+\ No newline at end of file
++## معايير النجاح
++- مراجعة القوائم مع كل إصدار.
++- متابعة بنود العمل حتى الإغلاق.
+diff --git a/docs/11-security-compliance/README.md b/docs/11-security-compliance/README.md
+index 87954eb..8b0f739 100644
+--- a/docs/11-security-compliance/README.md
++++ b/docs/11-security-compliance/README.md
+@@ -1,9 +1,9 @@
+ # Security & Compliance
+ 
+-## Purpose
+-This section documents the security and compliance practices for EduCore, including security architecture, data protection, risk management, compliance requirements, and secure development practices.
++## الهدف
++يوثق هذا القسم ممارسات الأمان والامتثال في EduCore، بما يشمل المعمارية الأمنية، وحماية البيانات، وإدارة المخاطر، ومتطلبات الامتثال، وممارسات التطوير الآمن.
+ 
+-## Sections
++## الأقسام
+ 1. Security Architecture
+ 2. Compliance Requirements
+ 3. Data Classification
+@@ -13,4 +13,4 @@ This section documents the security and compliance practices for EduCore, includ
+ 7. Risk Management
+ 8. Security Checklists
+ 
+-> Each topic will be documented in a dedicated file.
+\ No newline at end of file
++> سيتم توثيق كل موضوع في ملف مستقل.
+diff --git a/docs/12-development-standards/01-coding-standards.md b/docs/12-development-standards/01-coding-standards.md
+index edce5f7..562981c 100644
+--- a/docs/12-development-standards/01-coding-standards.md
++++ b/docs/12-development-standards/01-coding-standards.md
+@@ -1,30 +1,30 @@
+ # Coding Standards
+ 
+-## Purpose
+-Define the coding standards used throughout EduCore to ensure consistency, readability, maintainability, and long-term sustainability.
++## الهدف
++تحديد معايير كتابة الكود المستخدمة في EduCore لضمان الاتساق وسهولة القراءة والصيانة والاستمرارية طويلة المدى.
+ 
+-## General Principles
+-- Write clear and self-explanatory code.
+-- Prefer simplicity over unnecessary complexity.
+-- Follow established project conventions.
+-- Keep functions and classes focused on a single responsibility.
++## المبادئ العامة
++- كتابة كود واضح يشرح نفسه بنفسه.
++- تفضيل البساطة على التعقيد غير الضروري.
++- الالتزام بالمعايير المتفق عليها في المشروع.
++- إبقاء الدوال والفئات مركزة على مسؤولية واحدة.
+ 
+-## Naming Conventions
+-- Use meaningful names.
+-- Follow language-specific naming styles.
+-- Avoid abbreviations unless widely understood.
++## قواعد التسمية
++- استخدام أسماء ذات معنى واضح.
++- الالتزام بأسلوب التسمية الخاص بكل لغة برمجة.
++- تجنب الاختصارات غير المفهومة على نطاق واسع.
+ 
+-## Code Organization
+-- Group related functionality together.
+-- Separate business logic from presentation.
+-- Keep modules small and cohesive.
++## تنظيم الكود
++- تجميع الوظائف المترابطة معًا.
++- فصل منطق الأعمال عن طبقة العرض.
++- إبقاء الوحدات (Modules) صغيرة ومتماسكة.
+ 
+-## Documentation
+-- Document public APIs.
+-- Explain non-obvious business rules.
+-- Keep documentation synchronized with code.
++## التوثيق
++- توثيق واجهات API العامة.
++- شرح قواعد العمل غير الواضحة.
++- إبقاء التوثيق متزامنًا مع الكود.
+ 
+-## Success Criteria
+-- Code reviews confirm adherence to standards.
+-- New code follows agreed conventions.
+-- Standards evolve through team consensus.
+\ No newline at end of file
++## معايير النجاح
++- تؤكد مراجعات الكود الالتزام بالمعايير.
++- الكود الجديد يتبع القواعد المتفق عليها.
++- تطور المعايير بتوافق الفريق.
+diff --git a/docs/12-development-standards/02-git-workflow.md b/docs/12-development-standards/02-git-workflow.md
+index efe619a..2890518 100644
+--- a/docs/12-development-standards/02-git-workflow.md
++++ b/docs/12-development-standards/02-git-workflow.md
+@@ -1,23 +1,23 @@
+ # Git Workflow
+ 
+-## Purpose
+-Define the Git workflow used by EduCore to ensure consistent collaboration, traceability, and reliable software delivery.
++## الهدف
++تحديد سير عمل Git المستخدم في EduCore لضمان تعاون متسق وقابلية تتبع وتسليم برمجي موثوق.
+ 
+-## Workflow
+-1. Create a feature branch from the main development branch.
+-2. Implement and test changes locally.
+-3. Commit using the project's commit message convention.
+-4. Push the branch and open a pull request.
+-5. Complete code review and required checks.
+-6. Merge after approval.
++## سير العمل
++1. إنشاء فرع ميزة (Feature Branch) من الفرع الرئيسي للتطوير.
++2. تنفيذ واختبار التغييرات محليًا.
++3. عمل Commit وفق اصطلاح رسائل الالتزام الخاص بالمشروع.
++4. رفع الفرع وفتح Pull Request.
++5. إكمال مراجعة الكود والفحوصات المطلوبة.
++6. الدمج بعد الاعتماد.
+ 
+-## Principles
+-- Keep branches short-lived.
+-- Rebase or merge regularly from the target branch.
+-- Resolve conflicts before review.
+-- Avoid direct commits to protected branches.
++## المبادئ
++- إبقاء الفروع قصيرة العمر.
++- عمل Rebase أو Merge بشكل دوري من الفرع الهدف.
++- حل التعارضات قبل المراجعة.
++- تجنب الـ Commit المباشر على الفروع المحمية.
+ 
+-## Success Criteria
+-- All changes are submitted through pull requests.
+-- Required checks pass before merging.
+-- Git history remains clear and traceable.
+\ No newline at end of file
++## معايير النجاح
++- كل التغييرات تمر عبر Pull Requests.
++- نجاح الفحوصات المطلوبة قبل الدمج.
++- بقاء سجل Git واضحًا وقابلاً للتتبع.
+diff --git a/docs/12-development-standards/03-branching-strategy.md b/docs/12-development-standards/03-branching-strategy.md
+index fb28f6a..0b7f3ed 100644
+--- a/docs/12-development-standards/03-branching-strategy.md
++++ b/docs/12-development-standards/03-branching-strategy.md
+@@ -1,23 +1,23 @@
+ # Branching Strategy
+ 
+-## Purpose
+-Define the branching strategy for EduCore to support parallel development, stable releases, and efficient collaboration.
++## الهدف
++تحديد استراتيجية الفروع في EduCore لدعم التطوير المتوازي والإصدارات المستقرة والتعاون الفعّال.
+ 
+-## Branch Types
+-- `main` – Production-ready code.
+-- `develop` – Primary integration branch.
+-- `feature/*` – New features.
+-- `bugfix/*` – Non-critical fixes.
+-- `hotfix/*` – Urgent production fixes.
+-- `release/*` – Release preparation.
++## أنواع الفروع
++- `main` — الكود الجاهز للإنتاج.
++- `develop` — فرع التكامل الرئيسي.
++- `feature/*` — الميزات الجديدة.
++- `bugfix/*` — الإصلاحات غير الحرجة.
++- `hotfix/*` — إصلاحات عاجلة للإنتاج.
++- `release/*` — تجهيز الإصدار.
+ 
+-## Rules
+-- Create feature branches from `develop`.
+-- Merge changes through pull requests.
+-- Protect `main` from direct commits.
+-- Delete merged feature branches.
++## القواعد
++- إنشاء فروع الميزات من `develop`.
++- دمج التغييرات عبر Pull Requests فقط.
++- حماية `main` من الـ Commit المباشر.
++- حذف فروع الميزات بعد الدمج.
+ 
+-## Success Criteria
+-- Branch naming is consistent.
+-- All merges are reviewed.
+-- Release history remains clean and traceable.
+\ No newline at end of file
++## معايير النجاح
++- اتساق تسمية الفروع.
++- مراجعة جميع عمليات الدمج.
++- بقاء سجل الإصدارات نظيفًا وقابلاً للتتبع.
+diff --git a/docs/12-development-standards/04-commit-message-convention.md b/docs/12-development-standards/04-commit-message-convention.md
+index 72ae33f..a9fa61e 100644
+--- a/docs/12-development-standards/04-commit-message-convention.md
++++ b/docs/12-development-standards/04-commit-message-convention.md
+@@ -1,14 +1,14 @@
+ # Commit Message Convention
+ 
+-## Purpose
+-Define a consistent commit message format for EduCore to improve traceability, readability, and release management.
++## الهدف
++تحديد صيغة موحدة لرسائل الـ Commit في EduCore لتحسين قابلية التتبع والقراءة وإدارة الإصدارات.
+ 
+-## Format
++## الصيغة
+ ```
+-<type>(<scope>): <short summary>
++<type>(<scope>): <ملخص مختصر>
+ ```
+ 
+-## Common Types
++## الأنواع الشائعة
+ - feat
+ - fix
+ - docs
+@@ -19,17 +19,17 @@ Define a consistent commit message format for EduCore to improve traceability, r
+ - perf
+ - build
+ 
+-## Guidelines
+-- Use the imperative mood.
+-- Keep the summary concise.
+-- Reference issues when applicable.
+-- Describe breaking changes in the commit body when necessary.
++## الإرشادات
++- استخدام صيغة الأمر المباشر (Imperative Mood).
++- إبقاء الملخص مختصرًا.
++- الإشارة إلى رقم المهمة (Issue) عند الحاجة.
++- وصف التغييرات الجذرية (Breaking Changes) في نص الـ Commit عند الحاجة.
+ 
+-## Examples
++## أمثلة
+ - feat(auth): add password reset flow
+ - fix(api): handle expired access tokens
+ - docs(readme): update setup instructions
+ 
+-## Success Criteria
+-- All commits follow the agreed convention.
+-- Commit history remains clear and searchable.
+\ No newline at end of file
++## معايير النجاح
++- التزام جميع الـ Commits بالاصطلاح المتفق عليه.
++- بقاء سجل الـ Commits واضحًا وقابلًا للبحث.
+diff --git a/docs/12-development-standards/05-code-review-guidelines.md b/docs/12-development-standards/05-code-review-guidelines.md
+index 51c3634..6b54bf1 100644
+--- a/docs/12-development-standards/05-code-review-guidelines.md
++++ b/docs/12-development-standards/05-code-review-guidelines.md
+@@ -1,29 +1,29 @@
+ # Code Review Guidelines
+ 
+-## Purpose
+-Define the code review process for EduCore to improve code quality, maintainability, knowledge sharing, and consistency.
++## الهدف
++تحديد عملية مراجعة الكود في EduCore لتحسين الجودة وسهولة الصيانة ونقل المعرفة والاتساق.
+ 
+-## Objectives
+-- Detect defects early.
+-- Ensure compliance with coding standards.
+-- Encourage knowledge sharing.
+-- Improve long-term maintainability.
++## الأهداف
++- اكتشاف العيوب مبكرًا.
++- ضمان الالتزام بمعايير الكتابة البرمجية.
++- تشجيع نقل المعرفة بين الفريق.
++- تحسين قابلية الصيانة طويلة المدى.
+ 
+-## Review Checklist
+-- Code is readable and well-structured.
+-- Business requirements are implemented correctly.
+-- Tests are included or updated.
+-- Documentation is updated where needed.
+-- No obvious performance or reliability concerns.
++## قائمة تحقق المراجعة
++- الكود واضح ومنظم جيدًا.
++- تنفيذ متطلبات العمل بشكل صحيح.
++- وجود اختبارات مضافة أو محدثة.
++- تحديث التوثيق عند الحاجة.
++- عدم وجود مخاوف واضحة تتعلق بالأداء أو الموثوقية.
+ 
+-## Review Process
+-1. Open a pull request.
+-2. Complete automated checks.
+-3. Review by at least one qualified reviewer.
+-4. Address review feedback.
+-5. Merge after approval.
++## عملية المراجعة
++1. فتح Pull Request.
++2. اكتمال الفحوصات الآلية.
++3. مراجعة من مراجع مؤهل واحد على الأقل.
++4. معالجة ملاحظات المراجعة.
++5. الدمج بعد الاعتماد.
+ 
+-## Success Criteria
+-- All changes are reviewed before merging.
+-- Review feedback is resolved.
+-- Review turnaround time is monitored.
+\ No newline at end of file
++## معايير النجاح
++- مراجعة كل التغييرات قبل الدمج.
++- حل ملاحظات المراجعة.
++- مراقبة زمن دورة المراجعة.
+diff --git a/docs/12-development-standards/06-documentation-standards.md b/docs/12-development-standards/06-documentation-standards.md
+index 5e4c87e..4257328 100644
+--- a/docs/12-development-standards/06-documentation-standards.md
++++ b/docs/12-development-standards/06-documentation-standards.md
+@@ -1,27 +1,27 @@
+ # Documentation Standards
+ 
+-## Purpose
+-Define documentation standards for EduCore to ensure documentation remains accurate, consistent, discoverable, and maintainable.
++## الهدف
++تحديد معايير التوثيق في EduCore لضمان بقاء الوثائق دقيقة ومتسقة وسهلة الاكتشاف والصيانة.
+ 
+-## Principles
+-- Keep documentation close to the code when appropriate.
+-- Update documentation as part of every relevant change.
+-- Prefer clear language and practical examples.
+-- Record architectural decisions using ADRs.
++## المبادئ
++- إبقاء التوثيق قريبًا من الكود عند الملاءمة.
++- تحديث التوثيق كجزء من أي تغيير ذي صلة.
++- تفضيل اللغة الواضحة والأمثلة العملية.
++- توثيق القرارات المعمارية باستخدام ADR.
+ 
+-## Documentation Types
+-- Product documentation
+-- Architecture documentation
+-- API documentation
+-- Developer guides
+-- Operational runbooks
++## أنواع التوثيق
++- توثيق المنتج.
++- توثيق المعمارية.
++- توثيق API.
++- أدلة المطورين.
++- أدلة التشغيل (Runbooks).
+ 
+-## Review Process
+-- Documentation changes are reviewed with related code changes.
+-- Broken or outdated content is corrected promptly.
+-- Major documentation changes require peer review.
++## عملية المراجعة
++- مراجعة تغييرات التوثيق مع تغييرات الكود المرتبطة.
++- تصحيح المحتوى المكسور أو القديم فورًا.
++- مراجعة الأقران للتغييرات الكبيرة في التوثيق.
+ 
+-## Success Criteria
+-- Documentation reflects the current implementation.
+-- New features include required documentation.
+-- Documentation is easy to navigate and search.
+\ No newline at end of file
++## معايير النجاح
++- يعكس التوثيق التنفيذ الحالي فعليًا.
++- تتضمن الميزات الجديدة التوثيق المطلوب.
++- سهولة التصفح والبحث داخل التوثيق.
+diff --git a/docs/12-development-standards/07-dependency-management.md b/docs/12-development-standards/07-dependency-management.md
+index e693159..eb839d9 100644
+--- a/docs/12-development-standards/07-dependency-management.md
++++ b/docs/12-development-standards/07-dependency-management.md
+@@ -1,25 +1,25 @@
+ # Dependency Management
+ 
+-## Purpose
+-Define how external libraries, frameworks, and packages are selected, maintained, and updated in EduCore.
++## الهدف
++تحديد كيفية اختيار وصيانة وتحديث المكتبات وأطر العمل والحزم الخارجية في EduCore.
+ 
+-## Principles
+-- Prefer trusted and actively maintained dependencies.
+-- Minimize unnecessary dependencies.
+-- Keep dependencies up to date.
+-- Track licenses and compatibility.
++## المبادئ
++- تفضيل التبعيات الموثوقة والمُصانة بشكل نشط.
++- تقليل التبعيات غير الضرورية.
++- إبقاء التبعيات محدّثة.
++- متابعة التراخيص والتوافق.
+ 
+-## Version Management
+-- Pin versions where appropriate.
+-- Review major version upgrades before adoption.
+-- Remove unused dependencies regularly.
++## إدارة الإصدارات
++- تثبيت الإصدارات (Pin Versions) عند الملاءمة.
++- مراجعة الترقيات الرئيسية (Major Upgrades) قبل اعتمادها.
++- إزالة التبعيات غير المستخدمة بشكل دوري.
+ 
+-## Verification
+-- Review dependency changes during code review.
+-- Monitor dependency health and release notes.
+-- Validate compatibility before production releases.
++## التحقق
++- مراجعة تغييرات التبعيات أثناء مراجعة الكود.
++- متابعة صحة التبعيات وملاحظات الإصدارات.
++- التحقق من التوافق قبل إصدارات الإنتاج.
+ 
+-## Success Criteria
+-- Dependencies are regularly reviewed.
+-- Unsupported packages are replaced.
+-- Dependency updates follow the release process.
+\ No newline at end of file
++## معايير النجاح
++- مراجعة التبعيات بشكل دوري.
++- استبدال الحزم غير المدعومة.
++- اتباع تحديثات التبعيات لعملية الإصدار المعتمدة.
+diff --git a/docs/12-development-standards/08-definition-of-done.md b/docs/12-development-standards/08-definition-of-done.md
+index 372c4a1..b1b3f54 100644
+--- a/docs/12-development-standards/08-definition-of-done.md
++++ b/docs/12-development-standards/08-definition-of-done.md
+@@ -1,25 +1,25 @@
+ # Definition of Done
+ 
+-## Purpose
+-Define the minimum completion criteria that every EduCore work item must satisfy before it is considered complete.
++## الهدف
++تحديد الحد الأدنى من معايير الاكتمال التي يجب أن تحققها أي مهمة عمل في EduCore قبل اعتبارها منجزة.
+ 
+-## Functional Requirements
+-- Acceptance criteria are met.
+-- Required functionality is implemented.
+-- Edge cases are considered.
++## المتطلبات الوظيفية
++- تحقق معايير القبول.
++- تنفيذ الوظائف المطلوبة.
++- مراعاة الحالات الحدّية (Edge Cases).
+ 
+-## Quality Requirements
+-- Code follows project standards.
+-- Required tests pass.
+-- Documentation is updated.
+-- Code review is completed.
++## متطلبات الجودة
++- الكود يتبع معايير المشروع.
++- نجاح الاختبارات المطلوبة.
++- تحديث التوثيق.
++- اكتمال مراجعة الكود.
+ 
+-## Release Readiness
+-- No critical known issues remain.
+-- Build pipeline succeeds.
+-- Required approvals are completed.
++## الجاهزية للإصدار
++- عدم وجود مشاكل حرجة معروفة.
++- نجاح خط البناء (Build Pipeline).
++- اكتمال الموافقات المطلوبة.
+ 
+-## Success Criteria
+-- Teams apply the same completion standard.
+-- Work items are consistently releasable.
+-- Quality expectations are transparent.
+\ No newline at end of file
++## معايير النجاح
++- تطبيق الفرق لنفس معيار الاكتمال.
++- كون المهام قابلة للإصدار باستمرار.
++- شفافية توقعات الجودة.
+diff --git a/docs/12-development-standards/README.md b/docs/12-development-standards/README.md
+index 1a57632..bc028b2 100644
+--- a/docs/12-development-standards/README.md
++++ b/docs/12-development-standards/README.md
+@@ -1,9 +1,9 @@
+ # Development Standards
+ 
+-## Purpose
+-This section defines the engineering standards and development practices for EduCore to ensure consistency, maintainability, and high-quality software delivery.
++## الهدف
++يحدد هذا القسم المعايير الهندسية وممارسات التطوير في EduCore لضمان الاتساق وسهولة الصيانة وتسليم برمجي عالي الجودة.
+ 
+-## Sections
++## الأقسام
+ 1. Coding Standards
+ 2. Git Workflow
+ 3. Branching Strategy
+@@ -13,4 +13,4 @@ This section defines the engineering standards and development practices for Edu
+ 7. Dependency Management
+ 8. Definition of Done
+ 
+-> Each topic will be documented in a dedicated file.
+\ No newline at end of file
++> سيتم توثيق كل موضوع في ملف مستقل.
+diff --git a/docs/13-release-management/01-release-strategy.md b/docs/13-release-management/01-release-strategy.md
+index f8973f0..ea70662 100644
+--- a/docs/13-release-management/01-release-strategy.md
++++ b/docs/13-release-management/01-release-strategy.md
+@@ -1,29 +1,29 @@
+ # Release Strategy
+ 
+-## Purpose
+-Define the release strategy for EduCore to ensure software is delivered in a predictable, controlled, and reliable manner.
++## الهدف
++تحديد استراتيجية الإصدار في EduCore لضمان تسليم البرمجيات بطريقة متوقعة ومنضبطة وموثوقة.
+ 
+-## Release Types
+-- Major releases
+-- Minor releases
+-- Patch releases
+-- Emergency hotfix releases
++## أنواع الإصدارات
++- إصدارات رئيسية (Major).
++- إصدارات فرعية (Minor).
++- إصدارات تصحيحية (Patch).
++- إصدارات إصلاح عاجل (Emergency Hotfix).
+ 
+-## Release Process
+-1. Complete development.
+-2. Finish verification activities.
+-3. Obtain required approvals.
+-4. Deploy to production.
+-5. Validate release health.
+-6. Monitor post-release.
++## عملية الإصدار
++1. اكتمال التطوير.
++2. اكتمال أنشطة التحقق.
++3. الحصول على الموافقات المطلوبة.
++4. النشر على بيئة الإنتاج.
++5. التحقق من صحة الإصدار.
++6. المراقبة بعد الإصدار.
+ 
+-## Principles
+-- Prefer small, incremental releases.
+-- Automate deployment where possible.
+-- Maintain rollback capability.
+-- Communicate release plans clearly.
++## المبادئ
++- تفضيل الإصدارات الصغيرة والتدريجية.
++- أتمتة النشر قدر الإمكان.
++- الحفاظ على إمكانية التراجع (Rollback).
++- التواصل الواضح حول خطط الإصدار.
+ 
+-## Success Criteria
+-- Releases are repeatable and documented.
+-- Production deployments are monitored.
+-- Rollback procedures are available when required.
+\ No newline at end of file
++## معايير النجاح
++- الإصدارات قابلة للتكرار وموثقة.
++- مراقبة عمليات النشر على الإنتاج.
++- توفر إجراءات التراجع عند الحاجة.
+diff --git a/docs/13-release-management/02-versioning-policy.md b/docs/13-release-management/02-versioning-policy.md
+index 9621773..3ea560d 100644
+--- a/docs/13-release-management/02-versioning-policy.md
++++ b/docs/13-release-management/02-versioning-policy.md
+@@ -1,26 +1,26 @@
+ # Versioning Policy
+ 
+-## Purpose
+-Define the versioning policy used by EduCore to ensure releases are identifiable, predictable, and easy to communicate.
++## الهدف
++تحديد سياسة ترقيم الإصدارات في EduCore لضمان كون الإصدارات قابلة للتمييز والتوقع وسهلة التواصل بشأنها.
+ 
+-## Version Format
+-EduCore follows Semantic Versioning:
++## صيغة الإصدار
++يتبع EduCore نظام Semantic Versioning:
+ 
+ ```
+ MAJOR.MINOR.PATCH
+ ```
+ 
+-## Version Rules
+-- Increment **MAJOR** for incompatible changes.
+-- Increment **MINOR** for backward-compatible features.
+-- Increment **PATCH** for backward-compatible fixes.
++## قواعد الترقيم
++- زيادة **MAJOR** عند وجود تغييرات غير متوافقة.
++- زيادة **MINOR** عند إضافة ميزات متوافقة مع الإصدارات السابقة.
++- زيادة **PATCH** عند إصلاحات متوافقة مع الإصدارات السابقة.
+ 
+-## Release Tags
+-- Tag every production release.
+-- Keep release history immutable.
+-- Document significant changes in release notes.
++## وسوم الإصدار (Tags)
++- وضع Tag لكل إصدار إنتاجي.
++- الحفاظ على سجل الإصدارات دون تعديل (Immutable).
++- توثيق التغييرات المهمة في Release Notes.
+ 
+-## Success Criteria
+-- Every release has a unique version.
+-- Version numbers reflect change impact.
+-- Version history is traceable.
+\ No newline at end of file
++## معايير النجاح
++- امتلاك كل إصدار رقمًا فريدًا.
++- عكس أرقام الإصدارات لحجم التغيير الفعلي.
++- قابلية تتبع سجل الإصدارات.
+diff --git a/docs/13-release-management/03-release-checklist.md b/docs/13-release-management/03-release-checklist.md
+index 4b0f7a2..23dbc92 100644
+--- a/docs/13-release-management/03-release-checklist.md
++++ b/docs/13-release-management/03-release-checklist.md
+@@ -1,27 +1,27 @@
+ # Release Checklist
+ 
+-## Purpose
+-Provide a standardized checklist to verify release readiness before deploying EduCore to production.
++## الهدف
++توفير قائمة تحقق موحدة للتأكد من جاهزية الإصدار قبل نشر EduCore على بيئة الإنتاج.
+ 
+-## Pre-Release
+-- All planned features are complete.
+-- Automated tests pass.
+-- Code review is complete.
+-- Documentation is updated.
+-- Release notes are prepared.
++## قبل الإصدار
++- اكتمال جميع الميزات المخطط لها.
++- نجاح الاختبارات الآلية.
++- اكتمال مراجعة الكود.
++- تحديث التوثيق.
++- تجهيز Release Notes.
+ 
+-## Deployment
+-- Deployment plan approved.
+-- Backup verified.
+-- Monitoring enabled.
+-- Rollback plan confirmed.
++## أثناء النشر
++- اعتماد خطة النشر.
++- التحقق من النسخ الاحتياطية.
++- تفعيل المراقبة.
++- تأكيد خطة التراجع.
+ 
+-## Post-Release
+-- Smoke tests completed.
+-- Critical services verified.
+-- Metrics monitored.
+-- Stakeholders notified.
++## بعد النشر
++- اكتمال اختبارات Smoke.
++- التحقق من الخدمات الحرجة.
++- مراقبة المؤشرات.
++- إبلاغ أصحاب المصلحة.
+ 
+-## Success Criteria
+-- Every production release follows this checklist.
+-- Deviations are documented and reviewed.
+\ No newline at end of file
++## معايير النجاح
++- اتباع كل إصدار إنتاجي لهذه القائمة.
++- توثيق ومراجعة أي انحراف عنها.
+diff --git a/docs/13-release-management/04-release-notes.md b/docs/13-release-management/04-release-notes.md
+index 9314231..d151583 100644
+--- a/docs/13-release-management/04-release-notes.md
++++ b/docs/13-release-management/04-release-notes.md
+@@ -1,24 +1,24 @@
+ # Release Notes
+ 
+-## Purpose
+-Define a standard format for documenting changes included in each EduCore release.
++## الهدف
++تحديد صيغة موحدة لتوثيق التغييرات المضمّنة في كل إصدار من EduCore.
+ 
+-## Objectives
+-- Communicate new features and fixes.
+-- Highlight breaking changes.
+-- Provide upgrade guidance.
+-- Maintain a historical record of releases.
++## الأهداف
++- توصيل الميزات الجديدة والإصلاحات.
++- إبراز التغييرات الجذرية (Breaking Changes).
++- توفير إرشادات الترقية.
++- الحفاظ على سجل تاريخي للإصدارات.
+ 
+-## Template
+-### Version
+-### Release Date
+-### New Features
+-### Improvements
+-### Bug Fixes
+-### Breaking Changes
+-### Known Issues
+-### Upgrade Notes
++## القالب
++### رقم الإصدار
++### تاريخ الإصدار
++### ميزات جديدة
++### تحسينات
++### إصلاحات
++### تغييرات جذرية
++### مشاكل معروفة
++### ملاحظات الترقية
+ 
+-## Success Criteria
+-- Every production release includes release notes.
+-- Release notes are accurate, concise, and versioned.
+\ No newline at end of file
++## معايير النجاح
++- تضمين كل إصدار إنتاجي لملاحظات إصدار.
++- دقة ملاحظات الإصدار واختصارها وترقيمها بشكل صحيح.
+diff --git a/docs/13-release-management/05-rollback-procedures.md b/docs/13-release-management/05-rollback-procedures.md
+index fb13cab..8231eac 100644
+--- a/docs/13-release-management/05-rollback-procedures.md
++++ b/docs/13-release-management/05-rollback-procedures.md
+@@ -1,29 +1,29 @@
+ # Rollback Procedures
+ 
+-## Purpose
+-Define the standard rollback process for EduCore to restore service quickly and safely if a production release causes unexpected issues.
++## الهدف
++تحديد إجراء التراجع القياسي في EduCore لاستعادة الخدمة بسرعة وأمان في حال تسبب إصدار إنتاجي في مشاكل غير متوقعة.
+ 
+-## Objectives
+-- Minimize downtime.
+-- Protect data integrity.
+-- Restore stable service rapidly.
+-- Document rollback decisions.
++## الأهداف
++- تقليل زمن التوقف.
++- حماية سلامة البيانات.
++- استعادة استقرار الخدمة بسرعة.
++- توثيق قرارات التراجع.
+ 
+-## Rollback Process
+-1. Detect production issue.
+-2. Assess impact.
+-3. Approve rollback.
+-4. Execute rollback plan.
+-5. Verify system health.
+-6. Perform root cause analysis.
++## عملية التراجع
++1. اكتشاف المشكلة في الإنتاج.
++2. تقييم الأثر.
++3. اعتماد التراجع.
++4. تنفيذ خطة التراجع.
++5. التحقق من صحة النظام.
++6. تحليل السبب الجذري (Root Cause Analysis).
+ 
+-## Requirements
+-- Tested rollback procedures.
+-- Backup availability.
+-- Monitoring during rollback.
+-- Stakeholder communication.
++## المتطلبات
++- إجراءات تراجع مُختبرة مسبقًا.
++- توفر نسخ احتياطية.
++- المراقبة أثناء التراجع.
++- التواصل مع أصحاب المصلحة.
+ 
+-## Success Criteria
+-- Rollbacks are predictable and documented.
+-- Service is restored within agreed objectives.
+-- Lessons learned are recorded.
+\ No newline at end of file
++## معايير النجاح
++- كون عمليات التراجع متوقعة وموثقة.
++- استعادة الخدمة ضمن الأهداف المتفق عليها.
++- تسجيل الدروس المستفادة.
+diff --git a/docs/13-release-management/06-change-management.md b/docs/13-release-management/06-change-management.md
+index a57d5b3..06d3140 100644
+--- a/docs/13-release-management/06-change-management.md
++++ b/docs/13-release-management/06-change-management.md
+@@ -1,28 +1,28 @@
+ # Change Management
+ 
+-## Purpose
+-Define the process for planning, reviewing, approving, implementing, and documenting changes within EduCore.
++## الهدف
++تحديد عملية التخطيط والمراجعة والاعتماد والتنفيذ والتوثيق للتغييرات داخل EduCore.
+ 
+-## Objectives
+-- Minimize operational risk.
+-- Ensure changes are reviewed before implementation.
+-- Maintain traceability.
+-- Reduce service disruption.
++## الأهداف
++- تقليل المخاطر التشغيلية.
++- ضمان مراجعة التغييرات قبل التنفيذ.
++- الحفاظ على قابلية التتبع.
++- تقليل انقطاع الخدمة.
+ 
+-## Change Process
+-1. Submit change request.
+-2. Assess impact and risk.
+-3. Review and approve.
+-4. Schedule implementation.
+-5. Execute and validate.
+-6. Document outcomes.
++## عملية التغيير
++1. تقديم طلب التغيير.
++2. تقييم الأثر والمخاطر.
++3. المراجعة والاعتماد.
++4. جدولة التنفيذ.
++5. التنفيذ والتحقق.
++6. توثيق النتائج.
+ 
+-## Change Categories
+-- Standard changes
+-- Normal changes
+-- Emergency changes
++## فئات التغيير
++- تغييرات قياسية (Standard).
++- تغييرات عادية (Normal).
++- تغييرات طارئة (Emergency).
+ 
+-## Success Criteria
+-- Changes are approved before implementation.
+-- High-risk changes include rollback plans.
+-- Change history is documented and auditable.
+\ No newline at end of file
++## معايير النجاح
++- اعتماد التغييرات قبل التنفيذ.
++- تضمين التغييرات عالية الخطورة خطة تراجع.
++- توثيق سجل التغييرات وقابليته للتدقيق.
+diff --git a/docs/13-release-management/07-feature-flags.md b/docs/13-release-management/07-feature-flags.md
+index ee80633..73e61a6 100644
+--- a/docs/13-release-management/07-feature-flags.md
++++ b/docs/13-release-management/07-feature-flags.md
+@@ -1,28 +1,28 @@
+ # Feature Flags
+ 
+-## Purpose
+-Define how feature flags are used in EduCore to enable controlled feature rollout, experimentation, and risk reduction.
++## الهدف
++تحديد كيفية استخدام Feature Flags في EduCore لتمكين الإطلاق التدريجي للميزات والتجريب وتقليل المخاطر.
+ 
+-## Objectives
+-- Release features independently from deployments.
+-- Enable gradual rollouts.
+-- Reduce deployment risk.
+-- Support rapid rollback without code changes.
++## الأهداف
++- إصدار الميزات بشكل مستقل عن عمليات النشر.
++- تمكين الإطلاق التدريجي.
++- تقليل مخاطر النشر.
++- دعم التراجع السريع دون تعديل الكود.
+ 
+-## Guidelines
+-- Assign a clear owner to every feature flag.
+-- Document the purpose and expected lifetime.
+-- Remove obsolete flags promptly.
+-- Avoid long-lived permanent flags unless justified.
++## الإرشادات
++- تحديد مسؤول واضح لكل Feature Flag.
++- توثيق الغرض والعمر الزمني المتوقع.
++- إزالة الأعلام القديمة فورًا.
++- تجنب الأعلام الدائمة طويلة الأمد إلا لسبب مبرر.
+ 
+-## Rollout Strategy
+-1. Enable internally.
+-2. Roll out to a limited audience.
+-3. Monitor health and feedback.
+-4. Expand rollout.
+-5. Remove the flag after full adoption.
++## استراتيجية الإطلاق
++1. التفعيل داخليًا.
++2. الإطلاق لعدد محدود من المستخدمين.
++3. مراقبة الأداء وردود الفعل.
++4. توسيع نطاق الإطلاق.
++5. إزالة العلم بعد الاعتماد الكامل.
+ 
+-## Success Criteria
+-- Feature flags are tracked and documented.
+-- Stale flags are periodically removed.
+-- Rollouts are measurable and reversible.
+\ No newline at end of file
++## معايير النجاح
++- متابعة وتوثيق جميع الأعلام.
++- إزالة الأعلام القديمة بشكل دوري.
++- قابلية قياس وعكس عمليات الإطلاق.
+diff --git a/docs/13-release-management/08-post-release-validation.md b/docs/13-release-management/08-post-release-validation.md
+index 5ee7465..868c6ed 100644
+--- a/docs/13-release-management/08-post-release-validation.md
++++ b/docs/13-release-management/08-post-release-validation.md
+@@ -1,30 +1,30 @@
+ # Post-Release Validation
+ 
+-## Purpose
+-Define the validation activities performed after each EduCore production release to confirm system stability, functionality, and operational health.
++## الهدف
++تحديد أنشطة التحقق التي تُنفذ بعد كل إصدار إنتاجي لـ EduCore للتأكد من استقرار النظام ووظائفه وصحته التشغيلية.
+ 
+-## Objectives
+-- Verify successful deployment.
+-- Confirm critical business workflows.
+-- Detect issues early.
+-- Ensure monitoring and alerting operate correctly.
++## الأهداف
++- التحقق من نجاح النشر.
++- تأكيد تدفقات العمل الحرجة.
++- اكتشاف المشكلات مبكرًا.
++- التأكد من عمل المراقبة والتنبيهات بشكل صحيح.
+ 
+-## Validation Checklist
+-- Smoke tests completed.
+-- Critical user journeys verified.
+-- Application logs reviewed.
+-- Error rates within acceptable thresholds.
+-- Performance metrics validated.
+-- Monitoring dashboards healthy.
++## قائمة تحقق التحقق
++- اكتمال اختبارات Smoke.
++- التحقق من رحلات المستخدم الحرجة.
++- مراجعة سجلات التطبيق.
++- معدلات الأخطاء ضمن الحدود المقبولة.
++- التحقق من مؤشرات الأداء.
++- سلامة لوحات المراقبة.
+ 
+-## Incident Handling
+-1. Detect issue.
+-2. Assess severity.
+-3. Mitigate or rollback if required.
+-4. Record findings.
+-5. Schedule follow-up improvements.
++## التعامل مع الحوادث
++1. اكتشاف المشكلة.
++2. تقييم الخطورة.
++3. المعالجة أو التراجع عند الحاجة.
++4. تسجيل النتائج.
++5. جدولة تحسينات المتابعة.
+ 
+-## Success Criteria
+-- Every production release includes post-release validation.
+-- Critical issues are identified quickly.
+-- Validation results are documented and retained.
+\ No newline at end of file
++## معايير النجاح
++- تضمين كل إصدار إنتاجي للتحقق بعد الإصدار.
++- اكتشاف المشكلات الحرجة بسرعة.
++- توثيق نتائج التحقق والاحتفاظ بها.
+diff --git a/docs/13-release-management/README.md b/docs/13-release-management/README.md
+index b75e3e7..9cde87d 100644
+--- a/docs/13-release-management/README.md
++++ b/docs/13-release-management/README.md
+@@ -1,9 +1,9 @@
+ # Release Management
+ 
+-## Purpose
+-This section documents the release management practices for EduCore to ensure predictable, repeatable, and reliable software releases.
++## الهدف
++يوثق هذا القسم ممارسات إدارة الإصدارات في EduCore لضمان إصدارات برمجية متوقعة وقابلة للتكرار وموثوقة.
+ 
+-## Sections
++## الأقسام
+ 1. Release Strategy
+ 2. Versioning Policy
+ 3. Release Checklist
+@@ -13,4 +13,4 @@ This section documents the release management practices for EduCore to ensure pr
+ 7. Feature Flags
+ 8. Post-Release Validation
+ 
+-> Each topic will be documented in a dedicated file.
+\ No newline at end of file
++> سيتم توثيق كل موضوع في ملف مستقل.
+diff --git a/docs/14-observability/01-logging-strategy.md b/docs/14-observability/01-logging-strategy.md
+index 2f0b843..13a4ca3 100644
+--- a/docs/14-observability/01-logging-strategy.md
++++ b/docs/14-observability/01-logging-strategy.md
+@@ -1,33 +1,33 @@
+ # Logging Strategy
+ 
+-## Purpose
+-Define the logging strategy for EduCore to ensure consistent, searchable, and actionable application and infrastructure logs.
++## الهدف
++تحديد استراتيجية التسجيل (Logging) في EduCore لضمان سجلات تطبيق وبنية تحتية متسقة وقابلة للبحث وقابلة للتنفيذ عليها.
+ 
+-## Objectives
+-- Support troubleshooting.
+-- Enable security auditing.
+-- Improve operational visibility.
+-- Assist incident investigations.
++## الأهداف
++- دعم تحليل الأعطال (Troubleshooting).
++- تمكين التدقيق الأمني.
++- تحسين الرؤية التشغيلية.
++- المساعدة في التحقيق في الحوادث.
+ 
+-## Log Levels
++## مستويات السجل
+ - DEBUG
+ - INFO
+ - WARN
+ - ERROR
+ - FATAL
+ 
+-## Logging Guidelines
+-- Use structured logging where possible.
+-- Include correlation/request IDs.
+-- Avoid logging sensitive information.
+-- Standardize timestamps and formats.
++## إرشادات التسجيل
++- استخدام Structured Logging قدر الإمكان.
++- تضمين معرّفات الارتباط/الطلب (Correlation / Request IDs).
++- تجنب تسجيل المعلومات الحساسة.
++- توحيد التوقيت الزمني والتنسيقات.
+ 
+-## Retention
+-- Define retention periods by log type.
+-- Archive logs as required.
+-- Secure access to log storage.
++## الاحتفاظ بالسجلات
++- تحديد فترات احتفاظ حسب نوع السجل.
++- أرشفة السجلات عند الحاجة.
++- تأمين الوصول إلى تخزين السجلات.
+ 
+-## Success Criteria
+-- Logs are searchable and consistent.
+-- Sensitive data is protected.
+-- Critical events are captured reliably.
+\ No newline at end of file
++## معايير النجاح
++- كون السجلات قابلة للبحث ومتسقة.
++- حماية البيانات الحساسة.
++- التقاط الأحداث الحرجة بشكل موثوق.
+diff --git a/docs/14-observability/02-monitoring.md b/docs/14-observability/02-monitoring.md
+index 94dc64d..28c94ed 100644
+--- a/docs/14-observability/02-monitoring.md
++++ b/docs/14-observability/02-monitoring.md
+@@ -1,29 +1,29 @@
+ # Monitoring
+ 
+-## Purpose
+-Define the monitoring strategy for EduCore to continuously observe system health, detect anomalies, and support reliable operations.
++## الهدف
++تحديد استراتيجية المراقبة في EduCore لمتابعة صحة النظام باستمرار واكتشاف الأعطال ودعم تشغيل موثوق.
+ 
+-## Objectives
+-- Monitor application availability.
+-- Detect failures quickly.
+-- Track infrastructure health.
+-- Support proactive operations.
++## الأهداف
++- مراقبة توفر التطبيق (Availability).
++- اكتشاف الأعطال بسرعة.
++- متابعة صحة البنية التحتية.
++- دعم التشغيل الاستباقي.
+ 
+-## Monitoring Scope
+-- Application services
+-- APIs
+-- Databases
+-- Infrastructure
+-- Background jobs
+-- External integrations
++## نطاق المراقبة
++- خدمات التطبيق.
++- واجهات API.
++- قواعد البيانات.
++- البنية التحتية.
++- المهام الخلفية (Background Jobs).
++- التكاملات الخارجية.
+ 
+-## Guidelines
+-- Monitor critical business services.
+-- Define health checks.
+-- Continuously validate monitoring coverage.
+-- Review monitoring rules periodically.
++## الإرشادات
++- مراقبة الخدمات الحرجة للأعمال.
++- تحديد فحوصات الصحة (Health Checks).
++- التحقق المستمر من تغطية المراقبة.
++- مراجعة قواعد المراقبة بشكل دوري.
+ 
+-## Success Criteria
+-- Critical services are continuously monitored.
+-- Monitoring detects operational issues promptly.
+-- Monitoring coverage is reviewed regularly.
+\ No newline at end of file
++## معايير النجاح
++- مراقبة مستمرة للخدمات الحرجة.
++- اكتشاف المشكلات التشغيلية بسرعة.
++- مراجعة تغطية المراقبة بانتظام.
+diff --git a/docs/14-observability/03-metrics.md b/docs/14-observability/03-metrics.md
+index 39fe417..e275972 100644
+--- a/docs/14-observability/03-metrics.md
++++ b/docs/14-observability/03-metrics.md
+@@ -1,29 +1,29 @@
+ # Metrics
+ 
+-## Purpose
+-Define the metrics strategy for EduCore to measure system performance, reliability, capacity, and business health.
++## الهدف
++تحديد استراتيجية المقاييس في EduCore لقياس الأداء والموثوقية والسعة والصحة التجارية للنظام.
+ 
+-## Objectives
+-- Measure application health.
+-- Track infrastructure performance.
+-- Support capacity planning.
+-- Enable data-driven operational decisions.
++## الأهداف
++- قياس صحة التطبيق.
++- متابعة أداء البنية التحتية.
++- دعم تخطيط السعة (Capacity Planning).
++- تمكين قرارات تشغيلية مبنية على البيانات.
+ 
+-## Metric Categories
+-- Availability
+-- Latency
+-- Throughput
+-- Error Rate
+-- Resource Utilization
+-- Business Metrics
++## فئات المقاييس
++- التوفر (Availability)
++- زمن الاستجابة (Latency)
++- الإنتاجية (Throughput)
++- معدل الأخطاء (Error Rate)
++- استخدام الموارد (Resource Utilization)
++- مقاييس الأعمال (Business Metrics)
+ 
+-## Guidelines
+-- Prefer meaningful, actionable metrics.
+-- Define metric ownership.
+-- Establish collection intervals.
+-- Review metrics regularly.
++## الإرشادات
++- تفضيل المقاييس ذات المعنى والقابلة للتنفيذ.
++- تحديد مالك لكل مقياس.
++- تحديد فترات الجمع.
++- مراجعة المقاييس بانتظام.
+ 
+-## Success Criteria
+-- Critical services expose key metrics.
+-- Metrics support proactive operations.
+-- Historical trends are retained for analysis.
+\ No newline at end of file
++## معايير النجاح
++- عرض الخدمات الحرجة لمقاييسها الأساسية.
++- دعم المقاييس للتشغيل الاستباقي.
++- الاحتفاظ بالاتجاهات التاريخية للتحليل.
+diff --git a/docs/14-observability/04-distributed-tracing.md b/docs/14-observability/04-distributed-tracing.md
+index ab49d75..1b98f6d 100644
+--- a/docs/14-observability/04-distributed-tracing.md
++++ b/docs/14-observability/04-distributed-tracing.md
+@@ -1,29 +1,29 @@
+ # Distributed Tracing
+ 
+-## Purpose
+-Define the distributed tracing strategy for EduCore to follow requests across services and simplify troubleshooting in distributed systems.
++## الهدف
++تحديد استراتيجية التتبع الموزع (Distributed Tracing) في EduCore لمتابعة الطلبات عبر الخدمات وتسهيل تحليل الأعطال في الأنظمة الموزعة.
+ 
+-## Objectives
+-- Trace end-to-end requests.
+-- Identify latency bottlenecks.
+-- Correlate logs, metrics, and traces.
+-- Accelerate root cause analysis.
++## الأهداف
++- تتبع الطلبات من البداية للنهاية (End-to-End).
++- تحديد نقاط اختناق زمن الاستجابة.
++- ربط السجلات والمقاييس والتتبعات ببعضها.
++- تسريع تحليل السبب الجذري.
+ 
+-## Guidelines
+-- Propagate trace and span identifiers.
+-- Instrument critical services and APIs.
+-- Trace external service calls.
+-- Sample traces according to operational needs.
++## الإرشادات
++- تمرير معرّفات Trace وSpan عبر الخدمات.
++- تفعيل التتبع (Instrumentation) للخدمات وواجهات API الحرجة.
++- تتبع استدعاءات الخدمات الخارجية.
++- أخذ عينات (Sampling) من التتبعات حسب الحاجة التشغيلية.
+ 
+-## Trace Data
++## بيانات التتبع
+ - Trace ID
+ - Span ID
+ - Parent Span ID
+-- Service Name
+-- Duration
+-- Status
++- اسم الخدمة
++- المدة الزمنية
++- الحالة
+ 
+-## Success Criteria
+-- Critical request paths are traceable.
+-- Traces correlate with logs and metrics.
+-- Performance bottlenecks are identifiable.
+\ No newline at end of file
++## معايير النجاح
++- إمكانية تتبع مسارات الطلبات الحرجة.
++- ارتباط التتبعات بالسجلات والمقاييس.
++- إمكانية تحديد نقاط اختناق الأداء.
+diff --git a/docs/14-observability/05-alerting.md b/docs/14-observability/05-alerting.md
+index 2522cae..622a56e 100644
+--- a/docs/14-observability/05-alerting.md
++++ b/docs/14-observability/05-alerting.md
+@@ -1,28 +1,28 @@
+ # Alerting
+ 
+-## Purpose
+-Define the alerting strategy for EduCore to ensure operational issues are detected promptly and routed to the appropriate responders.
++## الهدف
++تحديد استراتيجية التنبيهات في EduCore لضمان اكتشاف المشكلات التشغيلية بسرعة وتوجيهها للمسؤولين المناسبين.
+ 
+-## Objectives
+-- Detect critical failures quickly.
+-- Minimize alert fatigue.
+-- Prioritize actionable alerts.
+-- Support rapid incident response.
++## الأهداف
++- اكتشاف الأعطال الحرجة بسرعة.
++- تقليل إجهاد التنبيهات (Alert Fatigue).
++- إعطاء الأولوية للتنبيهات القابلة للتنفيذ.
++- دعم الاستجابة السريعة للحوادث.
+ 
+-## Alert Categories
+-- Availability
+-- Performance
+-- Security
+-- Infrastructure
+-- Business-critical events
++## فئات التنبيهات
++- التوفر
++- الأداء
++- الأمان
++- البنية التحتية
++- الأحداث الحرجة للأعمال
+ 
+-## Guidelines
+-- Alert only on actionable conditions.
+-- Define severity levels.
+-- Assign ownership for every alert.
+-- Regularly review and tune alert rules.
++## الإرشادات
++- التنبيه فقط على الحالات القابلة للتنفيذ.
++- تحديد مستويات الخطورة.
++- تعيين مسؤول لكل تنبيه.
++- مراجعة وضبط قواعد التنبيه بشكل دوري.
+ 
+-## Success Criteria
+-- Critical alerts reach the correct responders.
+-- False positives are minimized.
+-- Alert response times are monitored and improved.
+\ No newline at end of file
++## معايير النجاح
++- وصول التنبيهات الحرجة للمسؤولين الصحيحين.
++- تقليل الإنذارات الكاذبة.
++- مراقبة وتحسين زمن الاستجابة للتنبيهات.
+diff --git a/docs/14-observability/06-dashboards.md b/docs/14-observability/06-dashboards.md
+index 59d2675..dcfc4f4 100644
+--- a/docs/14-observability/06-dashboards.md
++++ b/docs/14-observability/06-dashboards.md
+@@ -1,28 +1,28 @@
+ # Dashboards
+ 
+-## Purpose
+-Define dashboard standards for EduCore to provide clear, real-time visibility into system health, performance, and business operations.
++## الهدف
++تحديد معايير لوحات المعلومات في EduCore لتوفير رؤية واضحة ولحظية لصحة النظام وأدائه وعملياته التجارية.
+ 
+-## Objectives
+-- Present actionable operational insights.
+-- Support rapid incident investigation.
+-- Track business and technical KPIs.
+-- Provide role-specific views.
++## الأهداف
++- عرض رؤى تشغيلية قابلة للتنفيذ.
++- دعم التحقيق السريع في الحوادث.
++- متابعة مؤشرات الأداء الفنية والتجارية (KPIs).
++- توفير عروض مخصصة حسب الدور الوظيفي.
+ 
+-## Dashboard Categories
+-- Executive dashboards
+-- Operational dashboards
+-- Infrastructure dashboards
+-- Application dashboards
+-- Business dashboards
++## فئات اللوحات
++- لوحات تنفيذية (Executive).
++- لوحات تشغيلية.
++- لوحات البنية التحتية.
++- لوحات التطبيق.
++- لوحات الأعمال.
+ 
+-## Guidelines
+-- Display only meaningful metrics.
+-- Keep dashboards easy to interpret.
+-- Use consistent naming and layout.
+-- Review dashboards regularly.
++## الإرشادات
++- عرض المقاييس ذات المعنى فقط.
++- إبقاء اللوحات سهلة الفهم.
++- استخدام تسمية وتخطيط متسقين.
++- مراجعة اللوحات بشكل دوري.
+ 
+-## Success Criteria
+-- Dashboards reflect current system state.
+-- Critical KPIs are visible.
+-- Teams rely on dashboards for operational decisions.
+\ No newline at end of file
++## معايير النجاح
++- عكس اللوحات لحالة النظام الحالية.
++- ظهور مؤشرات الأداء الحرجة بوضوح.
++- اعتماد الفرق على اللوحات لاتخاذ القرارات التشغيلية.
+diff --git a/docs/14-observability/07-incident-response.md b/docs/14-observability/07-incident-response.md
+index 31e6c91..6e3a1e6 100644
+--- a/docs/14-observability/07-incident-response.md
++++ b/docs/14-observability/07-incident-response.md
+@@ -1,35 +1,35 @@
+ # Incident Response
+ 
+-## Purpose
+-Define the incident response process for EduCore to detect, assess, contain, resolve, and learn from operational incidents.
++## الهدف
++تحديد عملية الاستجابة للحوادث في EduCore لاكتشاف الحوادث التشغيلية وتقييمها واحتوائها وحلها والتعلم منها.
+ 
+-## Objectives
+-- Restore services quickly.
+-- Minimize business impact.
+-- Ensure clear communication.
+-- Capture lessons learned.
++## الأهداف
++- استعادة الخدمات بسرعة.
++- تقليل الأثر على الأعمال.
++- ضمان تواصل واضح.
++- تسجيل الدروس المستفادة.
+ 
+-## Incident Lifecycle
+-1. Detection
+-2. Assessment
+-3. Containment
+-4. Resolution
+-5. Recovery
+-6. Post-Incident Review
++## دورة حياة الحادث
++1. الاكتشاف
++2. التقييم
++3. الاحتواء
++4. الحل
++5. الاستعادة
++6. المراجعة بعد الحادث
+ 
+-## Severity Levels
+-- Critical
+-- High
+-- Medium
+-- Low
++## مستويات الخطورة
++- حرج (Critical)
++- عالٍ (High)
++- متوسط (Medium)
++- منخفض (Low)
+ 
+-## Guidelines
+-- Assign an incident owner.
+-- Maintain an incident timeline.
+-- Communicate status updates.
+-- Document corrective actions.
++## الإرشادات
++- تعيين مالك للحادث.
++- الحفاظ على جدول زمني للحادث.
++- التواصل بتحديثات الحالة.
++- توثيق الإجراءات التصحيحية.
+ 
+-## Success Criteria
+-- Incidents are resolved within agreed targets.
+-- Root causes are documented.
+-- Preventive actions are tracked to completion.
+\ No newline at end of file
++## معايير النجاح
++- حل الحوادث ضمن الأهداف المتفق عليها.
++- توثيق الأسباب الجذرية.
++- متابعة الإجراءات الوقائية حتى الإغلاق.
+diff --git a/docs/14-observability/08-service-level-objectives.md b/docs/14-observability/08-service-level-objectives.md
+index b073ff7..9773bdf 100644
+--- a/docs/14-observability/08-service-level-objectives.md
++++ b/docs/14-observability/08-service-level-objectives.md
+@@ -1,28 +1,28 @@
+ # Service Level Objectives (SLOs)
+ 
+-## Purpose
+-Define Service Level Objectives (SLOs) for EduCore to establish measurable reliability targets and guide operational improvements.
++## الهدف
++تحديد أهداف مستوى الخدمة (SLOs) في EduCore لوضع أهداف موثوقية قابلة للقياس وتوجيه التحسينات التشغيلية.
+ 
+-## Objectives
+-- Define measurable reliability goals.
+-- Align operational expectations.
+-- Support continuous improvement.
+-- Drive error budget management.
++## الأهداف
++- تحديد أهداف موثوقية قابلة للقياس.
++- مواءمة التوقعات التشغيلية.
++- دعم التحسين المستمر.
++- إدارة ميزانية الخطأ (Error Budget).
+ 
+-## Core SLO Categories
+-- Availability
+-- Latency
+-- Error Rate
+-- Throughput
+-- Recovery Time
++## فئات SLO الأساسية
++- التوفر (Availability)
++- زمن الاستجابة (Latency)
++- معدل الأخطاء (Error Rate)
++- الإنتاجية (Throughput)
++- زمن الاستعادة (Recovery Time)
+ 
+-## Guidelines
+-- Define Service Level Indicators (SLIs) for each critical service.
+-- Establish realistic targets.
+-- Review SLO performance regularly.
+-- Investigate repeated SLO violations.
++## الإرشادات
++- تحديد مؤشرات مستوى الخدمة (SLIs) لكل خدمة حرجة.
++- وضع أهداف واقعية.
++- مراجعة أداء SLO بشكل دوري.
++- التحقيق في أي مخالفات متكررة لـ SLO.
+ 
+-## Success Criteria
+-- Critical services have documented SLOs.
+-- SLO performance is continuously monitored.
+-- Reliability targets influence engineering priorities.
+\ No newline at end of file
++## معايير النجاح
++- امتلاك الخدمات الحرجة لأهداف SLO موثقة.
++- مراقبة أداء SLO باستمرار.
++- تأثير أهداف الموثوقية على أولويات الهندسة.
+diff --git a/docs/14-observability/README.md b/docs/14-observability/README.md
+index 49c3b61..d84866c 100644
+--- a/docs/14-observability/README.md
++++ b/docs/14-observability/README.md
+@@ -1,9 +1,9 @@
+ # Observability
+ 
+-## Purpose
+-This section defines the observability strategy for EduCore to ensure system health, rapid incident detection, effective troubleshooting, and operational insights.
++## الهدف
++يحدد هذا القسم استراتيجية المراقبة والرصد (Observability) في EduCore لضمان صحة النظام والاكتشاف السريع للحوادث وتحليل فعّال للأعطال ورؤى تشغيلية واضحة.
+ 
+-## Sections
++## الأقسام
+ 1. Logging Strategy
+ 2. Monitoring
+ 3. Metrics
+@@ -13,4 +13,4 @@ This section defines the observability strategy for EduCore to ensure system hea
+ 7. Incident Response
+ 8. Service Level Objectives (SLOs)
+ 
+-> Each topic will be documented in a dedicated file.
+\ No newline at end of file
++> سيتم توثيق كل موضوع في ملف مستقل.

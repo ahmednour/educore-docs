@@ -1,23 +1,23 @@
 # Git Workflow
 
-## Purpose
-Define the Git workflow used by EduCore to ensure consistent collaboration, traceability, and reliable software delivery.
+## الهدف
+تحديد سير عمل Git المستخدم في EduCore لضمان تعاون متسق وقابلية تتبع وتسليم برمجي موثوق.
 
-## Workflow
-1. Create a feature branch from the main development branch.
-2. Implement and test changes locally.
-3. Commit using the project's commit message convention.
-4. Push the branch and open a pull request.
-5. Complete code review and required checks.
-6. Merge after approval.
+## سير العمل
+1. إنشاء فرع ميزة (Feature Branch) من الفرع الرئيسي للتطوير.
+2. تنفيذ واختبار التغييرات محليًا.
+3. عمل Commit وفق اصطلاح رسائل الالتزام الخاص بالمشروع.
+4. رفع الفرع وفتح Pull Request.
+5. إكمال مراجعة الكود والفحوصات المطلوبة.
+6. الدمج بعد الاعتماد.
 
-## Principles
-- Keep branches short-lived.
-- Rebase or merge regularly from the target branch.
-- Resolve conflicts before review.
-- Avoid direct commits to protected branches.
+## المبادئ
+- إبقاء الفروع قصيرة العمر.
+- عمل Rebase أو Merge بشكل دوري من الفرع الهدف.
+- حل التعارضات قبل المراجعة.
+- تجنب الـ Commit المباشر على الفروع المحمية.
 
-## Success Criteria
-- All changes are submitted through pull requests.
-- Required checks pass before merging.
-- Git history remains clear and traceable.
+## معايير النجاح
+- كل التغييرات تمر عبر Pull Requests.
+- نجاح الفحوصات المطلوبة قبل الدمج.
+- بقاء سجل Git واضحًا وقابلاً للتتبع.

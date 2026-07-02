@@ -4,30 +4,30 @@
 Accepted
 
 ## Context
-EduCore requires a consistent security architecture to protect sensitive data, enforce authorization, and support compliance requirements.
+يحتاج EduCore إلى معمارية أمنية متسقة لحماية البيانات الحساسة، وفرض التفويض، ودعم متطلبات الامتثال.
 
 ## Decision
-- Adopt a Zero Trust approach.
-- Use Role-Based Access Control (RBAC), with future extensibility toward ABAC.
-- Encrypt data in transit using TLS and encrypt sensitive data at rest.
-- Require multi-factor authentication for privileged accounts.
-- Record security-sensitive actions in the audit log.
-- Perform periodic security reviews and vulnerability assessments.
+- اعتماد نهج Zero Trust.
+- استخدام Role-Based Access Control (RBAC)، مع إمكانية التوسع مستقبلاً نحو ABAC.
+- تشفير البيانات أثناء النقل باستخدام TLS، وتشفير البيانات الحساسة أثناء التخزين.
+- إلزام المصادقة متعددة العوامل (MFA) للحسابات ذات الصلاحيات الحساسة.
+- تسجيل الإجراءات الحساسة أمنيًا في سجل التدقيق (Audit Log).
+- إجراء مراجعات أمنية دورية وتقييمات للثغرات.
 
 ## Alternatives Considered
-- Perimeter-only security.
-- RBAC without MFA.
-- Partial encryption.
+- الأمان القائم على المحيط فقط (Perimeter-only Security).
+- RBAC بدون MFA.
+- تشفير جزئي.
 
 ## Consequences
-### Pros
-- Stronger protection against unauthorized access.
-- Improved compliance and auditability.
-- Better visibility into security events.
+### الإيجابيات
+- حماية أقوى ضد الوصول غير المصرح به.
+- تحسين الامتثال وقابلية التدقيق.
+- رؤية أفضل للأحداث الأمنية.
 
-### Cons
-- Increased operational complexity.
-- Additional key and identity management requirements.
+### السلبيات
+- زيادة التعقيد التشغيلي.
+- متطلبات إضافية لإدارة المفاتيح والهويات.
 
 ## References
 - NIST Zero Trust Architecture

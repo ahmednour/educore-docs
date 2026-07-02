@@ -4,29 +4,29 @@
 Accepted
 
 ## Context
-EduCore is expected to support increasing numbers of users, schools, and transactions while maintaining consistent performance and availability.
+من المتوقع أن يدعم EduCore أعدادًا متزايدة من المستخدمين والمدارس والمعاملات مع الحفاظ على أداء وتوفر ثابتين.
 
 ## Decision
-- Design services to scale horizontally where practical.
-- Introduce caching for frequently accessed data.
-- Support asynchronous processing for long-running tasks.
-- Use load balancing across application instances.
-- Optimize database access with indexing and read replicas when needed.
+- تصميم الخدمات لتدعم التوسع الأفقي (Horizontal Scaling) حيثما أمكن.
+- إدخال طبقة تخزين مؤقت (Caching) للبيانات كثيرة الوصول.
+- دعم المعالجة غير المتزامنة (Asynchronous Processing) للمهام طويلة التنفيذ.
+- استخدام موازنة الحمل (Load Balancing) عبر نسخ التطبيق.
+- تحسين الوصول لقاعدة البيانات عبر الفهرسة وRead Replicas عند الحاجة.
 
 ## Alternatives Considered
-- Vertical scaling only.
-- Monolithic scaling without workload separation.
-- No caching layer.
+- التوسع الرأسي (Vertical Scaling) فقط.
+- التوسع كوحدة Monolithic واحدة دون فصل الأحمال.
+- عدم استخدام طبقة تخزين مؤقت.
 
 ## Consequences
-### Pros
-- Better resilience under increased load.
-- Improved response times.
-- Flexible capacity planning.
+### الإيجابيات
+- مرونة أفضل تحت الحمل المتزايد.
+- تحسين أزمنة الاستجابة.
+- تخطيط سعة مرن.
 
-### Cons
-- Increased operational complexity.
-- Additional infrastructure and monitoring requirements.
+### السلبيات
+- زيادة التعقيد التشغيلي.
+- متطلبات إضافية للبنية التحتية والمراقبة.
 
 ## References
 - The Twelve-Factor App
