@@ -18,5 +18,6 @@
 6. ADR-006 Observability
 7. ADR-007 Security Model
 8. ADR-008 Scalability Strategy
+9. ADR-009 ZATCA E-Invoicing Strategy
 
 > سيتم إنشاء ملف مستقل لكل قرار معماري رئيسي.

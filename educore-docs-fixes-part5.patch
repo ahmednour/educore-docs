@@ -1,0 +1,325 @@
+diff --git a/docs/01-business/fees-and-payments.md b/docs/01-business/fees-and-payments.md
+index 71e7d83..90c967f 100644
+--- a/docs/01-business/fees-and-payments.md
++++ b/docs/01-business/fees-and-payments.md
+@@ -25,6 +25,7 @@
+ - BR-1503: لا يجوز أن يتجاوز مجموع المدفوعات قيمة الفاتورة إلا بصلاحية خاصة.
+ - BR-1504: جميع العمليات المالية تسجل في Audit Log.
+ - BR-1505: يمنع حذف أي عملية مالية بعد اعتمادها، ويستخدم الإلغاء أو القيود العكسية.
++- BR-1506: الفوترة الإلكترونية (ZATCA) اختيارية على مستوى الفرع (branches.zatca_enabled)؛ الفروع غير المرتبطة رسميًا بهيئة الزكاة والضريبة والجمارك تصدر فواتير عادية بدون رمز QR أو تكامل خارجي، دون أي تأثير على بقية دورة الرسوم والمدفوعات.
+ 
+ ## العلاقات
+ - Enrollment
+diff --git a/docs/02-database/schema.md b/docs/02-database/schema.md
+index 74d4bcc..307b777 100644
+--- a/docs/02-database/schema.md
++++ b/docs/02-database/schema.md
+@@ -64,17 +64,25 @@ branch_id.
+ | name_en | VARCHAR(200) | NOT NULL |
+ | code | VARCHAR(20) | UNIQUE NOT NULL |
+ | status | VARCHAR(20) | Active / Inactive |
++| zatca_enabled | BOOLEAN | DEFAULT false — يفعّل الفوترة الإلكترونية (ZATCA) لهذا الفرع فقط دون غيره |
++| zakat_tax_number | VARCHAR(30) | NULLABLE — الرقم الضريبي/رقم التسجيل في هيئة الزكاة والضريبة، إلزامي فقط إذا zatca_enabled = true |
+ 
+ ## academic_years
+ | العمود | النوع | ملاحظات |
+ |---|---|---|
+ | name | VARCHAR(50) | مثال: 2026-2027 |
+-| start_date | DATE | NOT NULL |
+-| end_date | DATE | NOT NULL |
++| start_date | DATE | NOT NULL — بالتقويم الميلادي |
++| end_date | DATE | NOT NULL — بالتقويم الميلادي |
++| hijri_name | VARCHAR(50) | NULLABLE — مثال: 1447-1448هـ |
++| hijri_start_date | VARCHAR(10) | NULLABLE — صيغة YYYY-MM-DD هجري، يُخزَّن كنص لأن PostgreSQL ليس له نوع تاريخ هجري أصلي |
++| hijri_end_date | VARCHAR(10) | NULLABLE — نفس ملاحظة hijri_start_date |
++| calendar_display_mode | VARCHAR(10) | Gregorian / Hijri / Both — يتحكم في العرض الافتراضي بالواجهة دون التأثير على القيم المخزنة |
+ | status | VARCHAR(20) | Draft / Active / Archived |
+ 
+ **Index:** UNIQUE (branch_id, name)
+ 
++> القيم الهجرية اختيارية (NULLABLE) وليست مصدر الحقيقة للحسابات الزمنية؛ كل منطق الترتيب والمقارنة والفرز يعتمد حصريًا على start_date وend_date الميلاديين، والحقول الهجرية تُستخدم للعرض والتقارير الرسمية فقط. عند الحاجة لتحويل تلقائي (ميلادي ↔ هجري) يُنفَّذ ذلك في طبقة Application عبر مكتبة تقويم أم القرى (Umm al-Qura) وليس داخل قاعدة البيانات.
++
+ ## programs
+ | العمود | النوع | ملاحظات |
+ |---|---|---|
+@@ -316,6 +324,11 @@ audit_logs
+ | enrollment_id | UUID | FK → enrollments.id |
+ | total_amount | NUMERIC(12,2) | NOT NULL |
+ | status | VARCHAR(20) | Draft / Issued / PartiallyPaid / Paid / Cancelled |
++| zatca_uuid | UUID | NULLABLE — يُعبّأ فقط إذا كان الفرع المرتبط zatca_enabled = true |
++| zatca_qr_code | TEXT | NULLABLE — Base64 لرمز QR المطلوب من منظومة فاتورة (Fatoora)، فارغ افتراضيًا للفروع غير المفعّلة |
++| zatca_status | VARCHAR(20) | NULLABLE — Not Applicable / Pending / Cleared / Rejected |
++
++> هذه الحقول كلها NULLABLE عمدًا وليست جزءًا من أي قيد NOT NULL، حتى لا تنكسر الفروع التي لا ترتبط رسميًا بهيئة الزكاة والضريبة. أي منطق لتوليد الفاتورة الإلكترونية يجب أن يتحقق أولاً من branches.zatca_enabled قبل تنفيذ أي استدعاء لمنصة ZATCA الخارجية.
+ 
+ ## payments
+ | العمود | النوع | ملاحظات |
+diff --git a/docs/03-api/api-design-principles.md b/docs/03-api/api-design-principles.md
+index 70ea8dc..8b864c7 100644
+--- a/docs/03-api/api-design-principles.md
++++ b/docs/03-api/api-design-principles.md
+@@ -28,3 +28,67 @@
+ ## الإصدارات
+ - استخدام Versioning عبر المسار: /api/v1/
+ - الحفاظ على التوافق مع الإصدارات السابقة قدر الإمكان.
++
++## Rate Limiting
++- تطبيق حد أقصى لعدد الطلبات لكل مستخدم أو مفتاح
++API
++
++في نافذة زمنية محددة
++(مثال: 100 طلب/دقيقة للعمليات القرائية، 20 طلب/دقيقة للعمليات الكتابية الحساسة).
++
++- إرجاع كود
++429 Too Many Requests
++
++مع
++Header
++
++باسم
++
++Retry-After
++
++عند تجاوز الحد.
++
++- تطبيق حدود أكثر صرامة على
++Endpoints
++
++الحساسة تحديداً:
++
++POST /api/v1/auth/login
++
++و
++
++POST /api/v1/finance/payments
++
++لمنع محاولات التخمين أو إساءة الاستخدام المالي.
++
++## Idempotency
++- كل عملية
++POST
++
++على موارد مالية
++(الدفعات تحديداً)
++
++يجب أن تدعم
++Header
++
++اسمه
++
++Idempotency-Key
++
++يرسله العميل
++(Client).
++
++- لو نفس المفتاح اتكرر خلال 24 ساعة، النظام يرجع نفس الاستجابة الأصلية من غير ما ينفذ العملية تاني، عشان يمنع تسجيل دفعة مكررة بسبب إعادة إرسال الطلب
++(Retry)
++
++من الشبكة أو تطبيق الجوال.
++
++- يُحتفظ بمفاتيح
++Idempotency
++
++لمدة 24 ساعة على الأقل في طبقة
++Caching
++
++مثل
++
++Redis.
+diff --git a/docs/09-architecture-decisions/ADR-009-zatca-e-invoicing.md b/docs/09-architecture-decisions/ADR-009-zatca-e-invoicing.md
+new file mode 100644
+index 0000000..cb09d9b
+--- /dev/null
++++ b/docs/09-architecture-decisions/ADR-009-zatca-e-invoicing.md
+@@ -0,0 +1,108 @@
++# ADR-009: ZATCA E-Invoicing Strategy
++
++## Status
++Accepted
++
++## Context
++يخدم
++EduCore
++
++مراكز تعليمية متنوعة، بعضها مرتبط رسميًا بهيئة الزكاة والضريبة والجمارك
++(ZATCA)
++
++ومُلزَم بمنظومة الفوترة الإلكترونية
++(فاتورة / Fatoora)،
++
++وبعضها الآخر لا يعمل بشكل رسمي مع الدولة من الناحية الضريبية حاليًا. النظام يحتاج دعم الحالتين من غير ما يفرض على كل الفروع نفس المتطلبات، ومن غير ما تحتاج إعادة هيكلة لاحقًا لو فرع قرر يتسجل رسميًا بعدين.
++
++## Decision
++- تفعيل الفوترة الإلكترونية يكون على مستوى الفرع وليس على مستوى النظام كله، عبر عمود
++branches.zatca_enabled.
++
++- الفروع اللي
++zatca_enabled = false
++
++تصدر فواتير عادية بدون
++QR Code
++
++أو أي استدعاء لمنصة
++
++ZATCA
++
++الخارجية، وده الوضع الافتراضي.
++
++- الفروع اللي
++zatca_enabled = true
++
++لازم يتوفر عندها
++
++zakat_tax_number،
++
++ويتفعّل توليد
++
++zatca_uuid
++
++و
++
++zatca_qr_code
++
++تلقائيًا مع كل فاتورة.
++
++- التكامل الفعلي مع منصة
++ZATCA
++
++(الاعتماد
++
++Compliance
++
++والإرسال المستمر
++
++Reporting)
++
++يُنفَّذ في طبقة
++
++Application
++
++كخدمة منفصلة قابلة للتفعيل، مش منطق مدموج جوه
++
++Controller
++
++الفوترة العام.
++
++- أي فرع يقرر التسجيل رسميًا بعدين، العملية تكون تفعيل إعداد فقط
++(Toggle)
++
++من غير أي تعديل على بنية قاعدة البيانات أو فقدان لبيانات الفواتير القديمة.
++
++## Alternatives Considered
++- إلزام كل الفروع بمنظومة
++ZATCA
++
++من اليوم الأول — تم الرفض لأنه يفرض تعقيد وتكلفة غير مبررة على فروع غير مسجلة رسميًا.
++
++- بناء نظام فوترة منفصل تمامًا لكل حالة — تم الرفض لأنه يضاعف الصيانة ويكسر توحيد جدول
++invoices
++
++الواحد.
++
++## Consequences
++### الإيجابيات
++- مرونة كاملة لكل فرع حسب وضعه الرسمي الفعلي.
++- عدم وجود أي تكلفة تقنية أو تعقيد إضافي على الفروع غير المسجلة.
++- جاهزية فورية لأي فرع يقرر التسجيل لاحقًا من غير Migration جديد.
++
++### السلبيات
++- الحاجة لاختبار السيناريوهين
++(مفعّل / غير مفعّل)
++
++بشكل منفصل في كل دورة اختبار للوحدة المالية.
++
++- منطق شرطي إضافي في طبقة
++Application
++
++عند توليد أي فاتورة.
++
++## References
++- هيئة الزكاة والضريبة والجمارك — منظومة فاتورة (ZATCA E-Invoicing)
++- 02-database/schema.md — جداول branches وinvoices
++- 01-business/fees-and-payments.md — BR-1506
+diff --git a/docs/09-architecture-decisions/README.md b/docs/09-architecture-decisions/README.md
+index 6ffd3e5..f30259b 100644
+--- a/docs/09-architecture-decisions/README.md
++++ b/docs/09-architecture-decisions/README.md
+@@ -18,5 +18,6 @@
+ 6. ADR-006 Observability
+ 7. ADR-007 Security Model
+ 8. ADR-008 Scalability Strategy
++9. ADR-009 ZATCA E-Invoicing Strategy
+ 
+ > سيتم إنشاء ملف مستقل لكل قرار معماري رئيسي.
+\ No newline at end of file
+diff --git a/docs/11-security-compliance/02-compliance-requirements.md b/docs/11-security-compliance/02-compliance-requirements.md
+index ad00f1f..c603df7 100644
+--- a/docs/11-security-compliance/02-compliance-requirements.md
++++ b/docs/11-security-compliance/02-compliance-requirements.md
+@@ -3,6 +3,32 @@
+ ## الهدف
+ توثيق متطلبات الامتثال المطبقة على EduCore وتحديد الضوابط اللازمة لدعم الالتزامات التنظيمية والمؤسسية.
+ 
++## الأطر التنظيمية المطبقة
++- نظام حماية البيانات الشخصية السعودي
++(PDPL)
++
++الصادر عن
++SDAIA،
++
++باعتباره الإطار القانوني الأساسي، لأن غالبية بيانات النظام تخص قُصّرًا
++(الطلاب)
++
++داخل المملكة العربية السعودية.
++
++- منظومة الفوترة الإلكترونية
++(ZATCA)
++
++كمتطلب اختياري على مستوى الفرع، موثق بالتفصيل في
++
++ADR-009-zatca-e-invoicing.md،
++
++وليس مطلوبًا من كل الفروع.
++
++- أطر عامة إضافية
++(ISO 27001)
++
++عند الحاجة لعملاء أو نطاق تشغيل خارج المملكة.
++
+ ## الأهداف
+ - تحديد أطر الامتثال المطبقة.
+ - تحديد الضوابط الإدارية والتقنية المطلوبة.
+diff --git a/docs/11-security-compliance/04-privacy-data-protection.md b/docs/11-security-compliance/04-privacy-data-protection.md
+index cf56347..b7d09be 100644
+--- a/docs/11-security-compliance/04-privacy-data-protection.md
++++ b/docs/11-security-compliance/04-privacy-data-protection.md
+@@ -1,7 +1,28 @@
+ # Privacy & Data Protection
+ 
+ ## الهدف
+-توثيق مبادئ الخصوصية وممارسات حماية البيانات المعتمدة في EduCore عبر دورة حياة المعلومات.
++توثيق مبادئ الخصوصية وممارسات حماية البيانات المعتمدة في EduCore عبر دورة حياة المعلومات، بما يتوافق مع نظام حماية البيانات الشخصية السعودي
++(PDPL).
++
++## اعتبار خاص: بيانات القُصّر
++غالبية الأشخاص أصحاب البيانات في النظام
++(الطلاب)
++
++قُصّر. طبقاً لـ
++PDPL،
++
++هذا يستوجب:
++- الحصول على موافقة ولي الأمر
++(Parent)
++
++بدل الطالب نفسه على معالجة البيانات.
++- تقييد الوصول لبيانات الطالب الحساسة
++(الصورة، رقم الهوية)
++
++بأدوار محددة فقط طبقاً لـ
++
++03-api/authorization.md.
++- حظر أي مشاركة لبيانات الطلاب مع أطراف خارجية دون موافقة صريحة موثقة.
+ 
+ ## الأهداف
+ - حماية المعلومات الشخصية.

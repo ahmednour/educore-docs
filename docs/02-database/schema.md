@@ -64,16 +64,24 @@ branch_id.
 | name_en | VARCHAR(200) | NOT NULL |
 | code | VARCHAR(20) | UNIQUE NOT NULL |
 | status | VARCHAR(20) | Active / Inactive |
+| zatca_enabled | BOOLEAN | DEFAULT false — يفعّل الفوترة الإلكترونية (ZATCA) لهذا الفرع فقط دون غيره |
+| zakat_tax_number | VARCHAR(30) | NULLABLE — الرقم الضريبي/رقم التسجيل في هيئة الزكاة والضريبة، إلزامي فقط إذا zatca_enabled = true |
 
 ## academic_years
 | العمود | النوع | ملاحظات |
 |---|---|---|
 | name | VARCHAR(50) | مثال: 2026-2027 |
-| start_date | DATE | NOT NULL |
-| end_date | DATE | NOT NULL |
+| start_date | DATE | NOT NULL — بالتقويم الميلادي |
+| end_date | DATE | NOT NULL — بالتقويم الميلادي |
+| hijri_name | VARCHAR(50) | NULLABLE — مثال: 1447-1448هـ |
+| hijri_start_date | VARCHAR(10) | NULLABLE — صيغة YYYY-MM-DD هجري، يُخزَّن كنص لأن PostgreSQL ليس له نوع تاريخ هجري أصلي |
+| hijri_end_date | VARCHAR(10) | NULLABLE — نفس ملاحظة hijri_start_date |
+| calendar_display_mode | VARCHAR(10) | Gregorian / Hijri / Both — يتحكم في العرض الافتراضي بالواجهة دون التأثير على القيم المخزنة |
 | status | VARCHAR(20) | Draft / Active / Archived |
 
 **Index:** UNIQUE (branch_id, name)
+
+> القيم الهجرية اختيارية (NULLABLE) وليست مصدر الحقيقة للحسابات الزمنية؛ كل منطق الترتيب والمقارنة والفرز يعتمد حصريًا على start_date وend_date الميلاديين، والحقول الهجرية تُستخدم للعرض والتقارير الرسمية فقط. عند الحاجة لتحويل تلقائي (ميلادي ↔ هجري) يُنفَّذ ذلك في طبقة Application عبر مكتبة تقويم أم القرى (Umm al-Qura) وليس داخل قاعدة البيانات.
 
 ## programs
 | العمود | النوع | ملاحظات |
@@ -316,6 +324,11 @@ audit_logs
 | enrollment_id | UUID | FK → enrollments.id |
 | total_amount | NUMERIC(12,2) | NOT NULL |
 | status | VARCHAR(20) | Draft / Issued / PartiallyPaid / Paid / Cancelled |
+| zatca_uuid | UUID | NULLABLE — يُعبّأ فقط إذا كان الفرع المرتبط zatca_enabled = true |
+| zatca_qr_code | TEXT | NULLABLE — Base64 لرمز QR المطلوب من منظومة فاتورة (Fatoora)، فارغ افتراضيًا للفروع غير المفعّلة |
+| zatca_status | VARCHAR(20) | NULLABLE — Not Applicable / Pending / Cleared / Rejected |
+
+> هذه الحقول كلها NULLABLE عمدًا وليست جزءًا من أي قيد NOT NULL، حتى لا تنكسر الفروع التي لا ترتبط رسميًا بهيئة الزكاة والضريبة. أي منطق لتوليد الفاتورة الإلكترونية يجب أن يتحقق أولاً من branches.zatca_enabled قبل تنفيذ أي استدعاء لمنصة ZATCA الخارجية.
 
 ## payments
 | العمود | النوع | ملاحظات |
