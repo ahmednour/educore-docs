@@ -177,6 +177,93 @@ branch_id.
 
 **Index:** UNIQUE (student_id, academic_year_id) WHERE status IN ('Active','Draft') — يفرض BR-1001 على مستوى قاعدة البيانات وليس منطق التطبيق فقط
 
+### تفعيل BR-1003 (الحد الأقصى لسعة الفصل)
+القاعدة كانت موثقة نصيًا فقط في
+01-business/enrollment.md
+
+بدون أي تطبيق فعلي على مستوى قاعدة البيانات. بما إن
+CHECK Constraint
+
+في
+
+PostgreSQL
+
+مايقدرش يعمل استعلام عبر جداول تانية، الحل الصحيح هو
+Trigger
+
+على
+
+enrollments،
+
+مع نقطة استثناء واحدة تتماشى مع نص القاعدة نفسه
+
+("إلا بصلاحية خاصة")
+
+عبر متغير جلسة
+(Session Setting)
+
+يفعّله التطبيق فقط لما يكون المستخدم صاحب صلاحية
+
+Enrollment.OverrideCapacity
+
+من
+
+03-api/authorization.md.
+
+```sql
+CREATE OR REPLACE FUNCTION enforce_classroom_capacity()
+RETURNS TRIGGER AS $$
+DECLARE
+  current_count INT;
+  max_capacity  INT;
+  bypass        TEXT;
+BEGIN
+  -- تجاوز القاعدة فقط لو التطبيق فعّل الصلاحية الخاصة صراحةً لهذه المعاملة
+  bypass := current_setting('educore.bypass_capacity_check', true);
+  IF bypass = 'true' THEN
+    RETURN NEW;
+  END IF;
+
+  IF NEW.status IN ('Active', 'Draft') THEN
+    SELECT capacity INTO max_capacity
+    FROM classrooms
+    WHERE id = NEW.classroom_id;
+
+    SELECT COUNT(*) INTO current_count
+    FROM enrollments
+    WHERE classroom_id = NEW.classroom_id
+      AND status IN ('Active', 'Draft')
+      AND id <> COALESCE(NEW.id, '00000000-0000-0000-0000-000000000000');
+
+    IF current_count >= max_capacity THEN
+      RAISE EXCEPTION 'BR-1003: تم تجاوز السعة القصوى للفصل (classroom_id=%)', NEW.classroom_id
+        USING ERRCODE = 'check_violation';
+    END IF;
+  END IF;
+
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER trg_enforce_classroom_capacity
+BEFORE INSERT OR UPDATE OF classroom_id, status ON enrollments
+FOR EACH ROW
+EXECUTE FUNCTION enforce_classroom_capacity();
+```
+
+**كيفية استخدام الاستثناء من التطبيق (Backend):**
+```sql
+SET LOCAL educore.bypass_capacity_check = 'true';
+-- ثم تنفيذ عملية الـ INSERT/UPDATE على enrollments داخل نفس الـ Transaction
+```
+يجب أن تُستدعى هذه الجملة فقط بعد التحقق من صلاحية
+Enrollment.OverrideCapacity
+
+على مستوى الكود، وتسجيل هذا التجاوز إلزاميًا في
+audit_logs
+
+(action = Approve).
+
 ## attendance
 | العمود | النوع | ملاحظات |
 |---|---|---|
